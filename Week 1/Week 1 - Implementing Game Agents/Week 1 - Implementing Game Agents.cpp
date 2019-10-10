@@ -40,13 +40,15 @@ public:
 	GameObject(IMesh* param_mesh, Vec3D* param_position, Vec3D* param_movement) {
 		position = param_position;
 		movement = param_movement;
-		model = mesh->CreateModel();
+		model = param_mesh->CreateModel();
 	}
-	void SetPosition(Vec3D param_position) {
-		*position = *position + param_position;
-	}
-	void MovePosition(Vec3D* param_position) {
+	void SetPosition(Vec3D* param_position) {
 		position->x = param_position->x;
+		position->y = param_position->x;
+		position->z = param_position->x;
+	}
+	void MovePosition(Vec3D param_position) {
+		*position = *position + param_position;
 	}
 	void UpdateModel() {
 		model->SetPosition(position->x,position->y,position->z);
@@ -74,7 +76,8 @@ void main()
 	IModel* model_state = mesh_state->CreateModel(0,2,0);
 
 	// Create gameobject
-	GameObject* guard = new GameObject();
+	GameObject* guard = new GameObject(mesh_guard, new Vec3D(0,0,0), new Vec3D(0,0,0));
+	guard->SetPosition(new Vec3D(1, 1, 1));
 
 
 	// The main game loop, repeat until engine is stopped
@@ -84,7 +87,7 @@ void main()
 		myEngine->DrawScene();
 
 		/**** Update your scene each frame here ****/
-		guard->MovePosition(new Vec3D(1,1,1));
+		guard->MovePosition(Vec3D(1,1,1));
 		guard->UpdateModel();
 
 	}
