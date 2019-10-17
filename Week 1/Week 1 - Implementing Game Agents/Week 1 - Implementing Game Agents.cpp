@@ -18,12 +18,17 @@ public:
 		y = param_y;
 		z = param_z;
 	}
-	Vec3D operator+(Vec3D param_vector) {
-		float new_x = x + param_vector.x;
-		float new_y = y + param_vector.y;
-		float new_z = z + param_vector.z;
-		Vec3D new_vector = Vec3D(new_x, new_y, new_z);
+	Vec3D* operator+(Vec3D* param_vector) {
+		float new_x = x + param_vector->x;
+		float new_y = y + param_vector->y;
+		float new_z = z + param_vector->z;
+		Vec3D* new_vector = new Vec3D(new_x, new_y, new_z);
 		return new_vector;
+	}
+	Vec3D* operator+=(Vec3D* param_vector) {
+		x += param_vector->x;
+		y += param_vector->y;
+		z += param_vector->z;
 	}
 };
 
@@ -42,13 +47,24 @@ public:
 		movement = param_movement;
 		model = param_mesh->CreateModel();
 	}
-	void SetPosition(Vec3D* param_position) {
-		position->x = param_position->x;
-		position->y = param_position->x;
-		position->z = param_position->x;
+	Vec3D* GetPosition() {
+		return position;
 	}
-	void MovePosition(Vec3D param_position) {
-		*position = *position + param_position;
+	void SetPosition(Vec3D* param_vector) {
+		position->x = param_vector->x;
+		position->y = param_vector->x;
+		position->z = param_vector->x;
+	}
+	Vec3D* GetMovement() {
+		return movement;
+	}
+	void SetMovement(Vec3D* param_vector) {
+		movement->x = param_vector->x;
+		movement->y = param_vector->x;
+		movement->z = param_vector->x;
+	}
+	void MovePosition(Vec3D* param_position) {
+		position = *position + param_position;
 	}
 	void UpdateModel() {
 		model->SetPosition(position->x,position->y,position->z);
@@ -87,7 +103,8 @@ void main()
 		myEngine->DrawScene();
 
 		/**** Update your scene each frame here ****/
-		guard->MovePosition(Vec3D(1,1,1));
+		guard->position += new Vec3D(1, 1, 1);
+		guard->MovePosition(guard->movement);
 		guard->UpdateModel();
 
 	}
