@@ -25,19 +25,47 @@ public:
 		Vec3D* new_vector = new Vec3D(new_x, new_y, new_z);
 		return new_vector;
 	}
-	Vec3D* operator+=(Vec3D* param_vector) {
+	Vec3D* operator-(Vec3D* param_vector) {
+		float new_x = x - param_vector->x;
+		float new_y = y - param_vector->y;
+		float new_z = z - param_vector->z;
+		Vec3D* new_vector = new Vec3D(new_x, new_y, new_z);
+		return new_vector;
+	}
+	Vec3D* operator*(float param_float) {
+		float new_x = x * param_float;
+		float new_y = y * param_float;
+		float new_z = z * param_float;
+		Vec3D* new_vector = new Vec3D(new_x, new_y, new_z);
+		return new_vector;
+	}
+	void operator+=(Vec3D* param_vector) {
 		x += param_vector->x;
 		y += param_vector->y;
 		z += param_vector->z;
+	}
+	void operator-=(Vec3D* param_vector) {
+		x -= param_vector->x;
+		y -= param_vector->y;
+		z -= param_vector->z;
 	}
 };
 
 class GameObject {
 public:
+	I3DEngine* engine;
 	IMesh* mesh;
 	IModel* model;
-	Vec3D* position; 
+	Vec3D* position;
 	Vec3D* movement;
+	EKeyCode key_turn_cw;
+	EKeyCode key_turn_ccw;
+	EKeyCode key_forward;
+	EKeyCode key_backward;
+	EKeyCode key_left;
+	EKeyCode key_right;
+	float move_speed = 0.0000015f;
+	float drag = 0.001f;
 	GameObject() {
 		position = new Vec3D();
 		movement = new Vec3D();
@@ -67,14 +95,43 @@ public:
 		position = *position + param_position;
 	}
 	void UpdateModel() {
-		model->SetPosition(position->x,position->y,position->z);
+		model->SetPosition(position->x, position->y, position->z);
+	}
+	void SetKeys(EKeyCode param_key_left, EKeyCode param_key_right, EKeyCode param_key_forward, EKeyCode param_key_backward) {
+		key_left = param_key_left;
+		key_right = param_key_right;
+		key_forward = param_key_forward;
+		key_backward = param_key_backward;
+	}
+	void apply_input() {
+		if (engine->KeyHeld(key_forward)) {
+			*movement += new Vec3D(0, 0, move_speed);
+		}
+		if (engine->KeyHeld(key_backward)) {
+			*movement += new Vec3D(0, 0, -move_speed);
+		}
+		if (engine->KeyHeld(key_left)) {
+			*movement += new Vec3D(-move_speed, 0, 0);
+		}
+		if (engine->KeyHeld(key_right)) {
+			*movement += new Vec3D(move_speed, 0, 0);
+		}
+	}
+	void reset_movement() {
+		*movement = Vec3D(0, 0, 0);
+	}
+	void apply_drag() {
+		movement = *movement - (*movement * drag);
+	}
+	void set_engine(I3DEngine* param_engine) {
+		engine = param_engine;
 	}
 };
 
 void main()
 {
 	// Create a 3D engine (using TLX engine here) and open a window for it
-	I3DEngine* myEngine = New3DEngine( kTLX );
+	I3DEngine* myEngine = New3DEngine(kTLX);
 	myEngine->StartWindowed();
 
 	// Add default folder for meshes and other media
@@ -86,14 +143,20 @@ void main()
 	IMesh* mesh_thief = myEngine->LoadMesh("sierra.x");
 	IMesh* mesh_state = myEngine->LoadMesh("state.x");
 
-	// Create models
-	IModel* model_guard = mesh_guard->CreateModel(0,0,0);
-	IModel* model_thief = mesh_thief->CreateModel(0,0,10);
-	IModel* model_state = mesh_state->CreateModel(0,2,0);
+	// Create thief
+	GameObject* thief = new GameObject(mesh_thief, new Vec3D(0, 1, 10), new Vec3D(0, 0, 0));
+	thief->set_engine(myEngine);
+	thief->SetKeys(Key_Left,Key_Right,Key_Up,Key_Down);
 
-	// Create gameobject
-	GameObject* guard = new GameObject(mesh_guard, new Vec3D(0,0,0), new Vec3D(0,0,0));
-	guard->SetPosition(new Vec3D(1, 1, 1));
+	// Create guard
+	GameObject* guard = new GameObject(mesh_guard, new Vec3D(0, 0, 0), new Vec3D(0, 0, 0));
+
+	// Create state
+	GameObject* state = new GameObject(mesh_state, new Vec3D(0, 2, 0), new Vec3D(0, 0, 0));
+
+	// Create camera
+	ICamera* camera = myEngine->CreateCamera(kManual,0,10,-10);
+	camera->RotateX(45);
 
 
 	// The main game loop, repeat until engine is stopped
@@ -103,10 +166,25 @@ void main()
 		myEngine->DrawScene();
 
 		/**** Update your scene each frame here ****/
-		guard->position += new Vec3D(1, 1, 1);
-		guard->MovePosition(guard->movement);
-		guard->UpdateModel();
 
+		// Thief input
+		thief->apply_input();
+
+		// Apply thief movement
+		*thief->position += thief->movement;
+
+		// Reset thief movement
+		thief->apply_drag();
+
+		// Update models
+		thief->UpdateModel();
+		guard->UpdateModel();
+		state->UpdateModel();
+
+		// Close engine
+		if (myEngine->KeyHit(Key_Escape)) {
+			myEngine->Stop();
+		}
 	}
 
 	// Delete the 3D engine now we are finished with it
