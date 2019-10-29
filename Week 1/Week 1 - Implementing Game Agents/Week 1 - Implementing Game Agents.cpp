@@ -49,10 +49,14 @@ public:
 		y -= param_vector->y;
 		z -= param_vector->z;
 	}
+	float get_distance() {
+		return sqrt(x * y * z);
+	}
 };
 
 class GameObject {
 public:
+	GameObject* child_object;
 	I3DEngine* engine;
 	IMesh* mesh;
 	IModel* model;
@@ -66,6 +70,7 @@ public:
 	EKeyCode key_right;
 	float move_speed = 0.0000015f;
 	float drag = 0.001f;
+	string state = "idle";
 	GameObject() {
 		position = new Vec3D();
 		movement = new Vec3D();
@@ -117,6 +122,9 @@ public:
 			*movement += new Vec3D(move_speed, 0, 0);
 		}
 	}
+	void apply_movement() {
+		*position += movement;
+	}
 	void reset_movement() {
 		*movement = Vec3D(0, 0, 0);
 	}
@@ -125,6 +133,30 @@ public:
 	}
 	void set_engine(I3DEngine* param_engine) {
 		engine = param_engine;
+	}
+	void idle() {
+		
+	}
+	void alert() {
+
+	}
+	void dead() {
+
+	}
+	void run_state() {
+		if (state == "idle") {
+			idle();
+		}
+		if (state == "alert") {
+			alert();
+		}
+		if (state == "dead") {
+			dead(); 
+		}
+	}
+	int distance_from_object(GameObject* param_object) {
+		Vec3D* difference_vector = *position - param_object->position;
+		return difference_vector->get_distance();
 	}
 };
 
@@ -171,7 +203,7 @@ void main()
 		thief->apply_input();
 
 		// Apply thief movement
-		*thief->position += thief->movement;
+		thief->apply_movement();
 
 		// Reset thief movement
 		thief->apply_drag();
