@@ -18,6 +18,11 @@ public:
 		y = param_y;
 		z = param_z;
 	}
+	Vec3D(Vec3D* param_vector) {
+		x = param_vector->x;
+		y = param_vector->y;
+		z = param_vector->z;
+	}
 	Vec3D* operator+(Vec3D* param_vector) {
 		float new_x = x + param_vector->x;
 		float new_y = y + param_vector->y;
@@ -56,7 +61,6 @@ public:
 
 class GameObject {
 public:
-	GameObject* child_object;
 	I3DEngine* engine;
 	IMesh* mesh;
 	IModel* model;
@@ -71,6 +75,7 @@ public:
 	float move_speed = 0.0000015f;
 	float drag = 0.001f;
 	string state = "idle";
+	int state_timer = 0;
 	GameObject() {
 		position = new Vec3D();
 		movement = new Vec3D();
@@ -134,13 +139,71 @@ public:
 	void set_engine(I3DEngine* param_engine) {
 		engine = param_engine;
 	}
+	int distance_from_object(GameObject* param_object) {
+		Vec3D* difference_vector = *position - param_object->position;
+		return difference_vector->get_distance();
+	}
+	void change_state(string param_state) {
+		state = param_state;
+		state_timer = 0;
+	}
+};
+
+class Guard : public GameObject {
+public:
+	Guard() : GameObject() {
+
+	}
+	Guard(IMesh* param_mesh, Vec3D* param_position, Vec3D* param_movement) : GameObject(param_mesh, param_position, param_movement) {
+
+	}
+	StateBox* state_box;
+	GameObject* target;
+	string idle_skin;
+	string alert_skin;
+	string dead_skin;
+	void run_state() {
+		if (state == "idle") {
+			idle();
+		}
+		if (state == "alert") {
+			alert();
+		}
+		if (state == "dead") {
+			dead();
+		}
+		state_timer++;
+	}
+	void create_box(IMesh* param_mesh) {
+		state_box = new StateBox(param_mesh,position,movement);
+	}
+	void set_target(GameObject* param_target) {
+		target = param_target;
+	}
 	void idle() {
-		
+		if (state_timer == 0) {
+			model->SetSkin(alert_skin);
+		}
 	}
 	void alert() {
 
 	}
 	void dead() {
+
+	}
+	void set_skins(string param_idle_skin, string param_alert_skin, string param_dead_skin) {
+		idle_skin = param_idle_skin;
+		alert_skin = param_alert_skin;
+		dead_skin = param_dead_skin;
+	}
+};
+
+class StateBox : public GameObject {
+public:
+	StateBox() : GameObject() {
+
+	}
+	StateBox(IMesh* param_mesh, Vec3D* param_position, Vec3D* param_movement) : GameObject(param_mesh, param_position, param_movement) {
 
 	}
 	void run_state() {
@@ -151,12 +214,19 @@ public:
 			alert();
 		}
 		if (state == "dead") {
-			dead(); 
+			dead();
 		}
 	}
-	int distance_from_object(GameObject* param_object) {
-		Vec3D* difference_vector = *position - param_object->position;
-		return difference_vector->get_distance();
+	void idle() {
+		if (state_timer = 0) {
+			model->SetSkin("");
+		}
+	}
+	void alert() {
+
+	}
+	void dead() {
+
 	}
 };
 
@@ -181,7 +251,8 @@ void main()
 	thief->SetKeys(Key_Left,Key_Right,Key_Up,Key_Down);
 
 	// Create guard
-	GameObject* guard = new GameObject(mesh_guard, new Vec3D(0, 0, 0), new Vec3D(0, 0, 0));
+	Guard* guard = new Guard(mesh_guard, new Vec3D(0, 0, 0), new Vec3D(0, 0, 0));
+	guard->create_box(mesh_state);
 
 	// Create state
 	GameObject* state = new GameObject(mesh_state, new Vec3D(0, 2, 0), new Vec3D(0, 0, 0));
@@ -208,10 +279,18 @@ void main()
 		// Reset thief movement
 		thief->apply_drag();
 
+		// Run
+		guard->run_state();
+		guard->state_box->run_state();
+
 		// Update models
 		thief->UpdateModel();
 		guard->UpdateModel();
+		guard->state_box->UpdateModel();
 		state->UpdateModel();
+
+		// Get distance
+
 
 		// Close engine
 		if (myEngine->KeyHit(Key_Escape)) {
