@@ -57,6 +57,11 @@ public:
 	float get_distance() {
 		return sqrt(x * y * z);
 	}
+	void normalise() {
+		x /= get_distance();
+		y /= get_distance();
+		z /= get_distance();
+	}
 };
 
 class GameObject {
@@ -146,6 +151,10 @@ public:
 	void change_state(string param_state) {
 		state = param_state;
 		state_timer = 0;
+	}
+	void look_at(GameObject* param_target) {
+		Vec3D* target_direction = (*param_target->position - position)->normalise;
+		Vec3D* directional_difference = target_direction - ;
 	}
 };
 
