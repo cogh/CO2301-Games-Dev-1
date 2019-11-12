@@ -17,46 +17,46 @@ public:
 		y = 0;
 		z = 0;
 	}
-	Vec3D(float param_x, float param_y, float param_z) {
-		x = param_x;
-		y = param_y;
-		z = param_z;
+	Vec3D(float arg_x, float arg_y, float arg_z) {
+		x = arg_x;
+		y = arg_y;
+		z = arg_z;
 	}
-	Vec3D(Vec3D* param_vector) {
-		x = param_vector->x;
-		y = param_vector->y;
-		z = param_vector->z;
+	Vec3D(Vec3D* arg_vector) {
+		x = arg_vector->x;
+		y = arg_vector->y;
+		z = arg_vector->z;
 	}
-	Vec3D* operator+(Vec3D* param_vector) {
-		float new_x = x + param_vector->x;
-		float new_y = y + param_vector->y;
-		float new_z = z + param_vector->z;
+	Vec3D* operator+(Vec3D* arg_vector) {
+		float new_x = x + arg_vector->x;
+		float new_y = y + arg_vector->y;
+		float new_z = z + arg_vector->z;
 		Vec3D* new_vector = new Vec3D(new_x, new_y, new_z);
 		return new_vector;
 	}
-	Vec3D* operator-(Vec3D* param_vector) {
-		float new_x = x - param_vector->x;
-		float new_y = y - param_vector->y;
-		float new_z = z - param_vector->z;
+	Vec3D* operator-(Vec3D* arg_vector) {
+		float new_x = x - arg_vector->x;
+		float new_y = y - arg_vector->y;
+		float new_z = z - arg_vector->z;
 		Vec3D* new_vector = new Vec3D(new_x, new_y, new_z);
 		return new_vector;
 	}
-	Vec3D* operator*(float param_float) {
-		float new_x = x * param_float;
-		float new_y = y * param_float;
-		float new_z = z * param_float;
+	Vec3D* operator*(float arg_float) {
+		float new_x = x * arg_float;
+		float new_y = y * arg_float;
+		float new_z = z * arg_float;
 		Vec3D* new_vector = new Vec3D(new_x, new_y, new_z);
 		return new_vector;
 	}
-	void operator+=(Vec3D* param_vector) {
-		x += param_vector->x;
-		y += param_vector->y;
-		z += param_vector->z;
+	void operator+=(Vec3D* arg_vector) {
+		x += arg_vector->x;
+		y += arg_vector->y;
+		z += arg_vector->z;
 	}
-	void operator-=(Vec3D* param_vector) {
-		x -= param_vector->x;
-		y -= param_vector->y;
-		z -= param_vector->z;
+	void operator-=(Vec3D* arg_vector) {
+		x -= arg_vector->x;
+		y -= arg_vector->y;
+		z -= arg_vector->z;
 	}
 	float get_distance() {
 		return sqrt(x * y * z);
@@ -68,13 +68,68 @@ public:
 	}
 };
 
+class Vec2D {
+public:
+	float x;
+	float y;
+	float z;
+	Vec2D() {
+		x = 0;
+		y = 0;
+	}
+	Vec2D(float arg_x, float arg_y) {
+		x = arg_x;
+		y = arg_y;
+	}
+	Vec2D(Vec2D* arg_vector) {
+		x = arg_vector->x;
+		y = arg_vector->y;
+	}
+	Vec2D* operator+(Vec2D* arg_vector) {
+		float new_x = x + arg_vector->x;
+		float new_y = y + arg_vector->y;
+		Vec2D* new_vector = new Vec2D(new_x, new_y);
+		return new_vector;
+	}
+	Vec2D* operator-(Vec2D* arg_vector) {
+		float new_x = x - arg_vector->x;
+		float new_y = y - arg_vector->y;
+		Vec2D* new_vector = new Vec2D(new_x, new_y);
+		return new_vector;
+	}
+	Vec2D* operator*(float arg_float) {
+		float new_x = x * arg_float;
+		float new_y = y * arg_float;
+		Vec2D* new_vector = new Vec2D(new_x, new_y);
+		return new_vector;
+	}
+	void operator+=(Vec2D* arg_vector) {
+		x += arg_vector->x;
+		y += arg_vector->y;
+	}
+	void operator-=(Vec2D* arg_vector) {
+		x -= arg_vector->x;
+		y -= arg_vector->y;
+	}
+	float get_distance() {
+		return sqrt(x * y);
+	}
+	void normalise() {
+		x /= get_distance();
+		y /= get_distance();
+	}
+	float dot_product(Vec2D arg_target) {
+		
+	}
+};
+
 class GameObject {
 public:
 	I3DEngine* engine;
 	IMesh* mesh;
 	IModel* model;
-	Vec3D* position;
-	Vec3D* movement;
+	Vec2D* position;
+	Vec2D* movement;
 	EKeyCode key_turn_cw;
 	EKeyCode key_turn_ccw;
 	EKeyCode key_forward;
@@ -86,79 +141,79 @@ public:
 	string state = "idle";
 	int state_timer = 0;
 	GameObject() {
-		position = new Vec3D();
-		movement = new Vec3D();
+		position = new Vec2D();
+		movement = new Vec2D();
 	}
-	GameObject(IMesh* param_mesh, Vec3D* param_position, Vec3D* param_movement) {
-		position = param_position;
-		movement = param_movement;
-		model = param_mesh->CreateModel();
+	GameObject(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) {
+		position = arg_position;
+		movement = arg_movement;
+		model = arg_mesh->CreateModel();
 	}
-	Vec3D* GetPosition() {
+	Vec2D* GetPosition() {
 		return position;
 	}
-	void SetPosition(Vec3D* param_vector) {
-		position->x = param_vector->x;
-		position->y = param_vector->x;
-		position->z = param_vector->x;
+	void SetPosition(Vec2D* arg_vector) {
+		position->x = arg_vector->x;
+		position->y = arg_vector->x;
+		position->z = arg_vector->x;
 	}
-	Vec3D* GetMovement() {
+	Vec2D* GetMovement() {
 		return movement;
 	}
-	void SetMovement(Vec3D* param_vector) {
-		movement->x = param_vector->x;
-		movement->y = param_vector->x;
-		movement->z = param_vector->x;
+	void SetMovement(Vec2D* arg_vector) {
+		movement->x = arg_vector->x;
+		movement->y = arg_vector->x;
+		movement->z = arg_vector->x;
 	}
-	void MovePosition(Vec3D* param_position) {
-		position = *position + param_position;
+	void MovePosition(Vec2D* arg_position) {
+		position = *position + arg_position;
 	}
 	void UpdateModel() {
 		model->SetPosition(position->x, position->y, position->z);
 	}
-	void SetKeys(EKeyCode param_key_left, EKeyCode param_key_right, EKeyCode param_key_forward, EKeyCode param_key_backward) {
-		key_left = param_key_left;
-		key_right = param_key_right;
-		key_forward = param_key_forward;
-		key_backward = param_key_backward;
+	void SetKeys(EKeyCode arg_key_left, EKeyCode arg_key_right, EKeyCode arg_key_forward, EKeyCode arg_key_backward) {
+		key_left = arg_key_left;
+		key_right = arg_key_right;
+		key_forward = arg_key_forward;
+		key_backward = arg_key_backward;
 	}
 	void apply_input() {
 		if (engine->KeyHeld(key_forward)) {
-			*movement += new Vec3D(0, 0, move_speed);
+			*movement += new Vec2D(0, move_speed);
 		}
 		if (engine->KeyHeld(key_backward)) {
-			*movement += new Vec3D(0, 0, -move_speed);
+			*movement += new Vec2D(0, -move_speed);
 		}
 		if (engine->KeyHeld(key_left)) {
-			*movement += new Vec3D(-move_speed, 0, 0);
+			*movement += new Vec2D(-move_speed, 0);
 		}
 		if (engine->KeyHeld(key_right)) {
-			*movement += new Vec3D(move_speed, 0, 0);
+			*movement += new Vec2D(move_speed, 0);
 		}
 	}
 	void apply_movement() {
 		*position += movement;
 	}
 	void reset_movement() {
-		*movement = Vec3D(0, 0, 0);
+		*movement = Vec2D(0, 0);
 	}
 	void apply_drag() {
 		movement = *movement - (*movement * drag);
 	}
-	void set_engine(I3DEngine* param_engine) {
-		engine = param_engine;
+	void set_engine(I3DEngine* arg_engine) {
+		engine = arg_engine;
 	}
-	int distance_from_object(GameObject* param_object) {
-		Vec3D* difference_vector = *position - param_object->position;
+	int distance_from_object(GameObject* arg_object) {
+		Vec2D* difference_vector = *position - arg_object->position;
 		return difference_vector->get_distance();
 	}
-	void change_state(string param_state) {
-		state = param_state;
+	void change_state(string arg_state) {
+		state = arg_state;
 		state_timer = 0;
 	}
-	void look_at(GameObject* param_target) {
-		Vec3D* target_direction = (*param_target->position - position)->normalise;
-		Vec3D* directional_difference = target_direction - ;
+	void look_at(GameObject* arg_target) {
+		Vec2D* target_direction = (*arg_target->position - position)->normalise;
+		Vec2D* directional_difference = target_direction - ;
 	}
 };
 
@@ -167,7 +222,7 @@ public:
 	Guard() : GameObject() {
 
 	}
-	Guard(IMesh* param_mesh, Vec3D* param_position, Vec3D* param_movement) : GameObject(param_mesh, param_position, param_movement) {
+	Guard(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) : GameObject(arg_mesh, arg_position, arg_movement) {
 
 	}
 	StateBox* state_box;
@@ -187,11 +242,11 @@ public:
 		}
 		state_timer++;
 	}
-	void create_box(IMesh* param_mesh) {
-		state_box = new StateBox(param_mesh,position,movement);
+	void create_box(IMesh* arg_mesh) {
+		state_box = new StateBox(arg_mesh,position,movement);
 	}
-	void set_target(GameObject* param_target) {
-		target = param_target;
+	void set_target(GameObject* arg_target) {
+		target = arg_target;
 	}
 	void idle() {
 		if (state_timer == 0) {
@@ -204,10 +259,10 @@ public:
 	void dead() {
 
 	}
-	void set_skins(string param_idle_skin, string param_alert_skin, string param_dead_skin) {
-		idle_skin = param_idle_skin;
-		alert_skin = param_alert_skin;
-		dead_skin = param_dead_skin;
+	void set_skins(string arg_idle_skin, string arg_alert_skin, string arg_dead_skin) {
+		idle_skin = arg_idle_skin;
+		alert_skin = arg_alert_skin;
+		dead_skin = arg_dead_skin;
 	}
 };
 
@@ -216,7 +271,7 @@ public:
 	StateBox() : GameObject() {
 
 	}
-	StateBox(IMesh* param_mesh, Vec3D* param_position, Vec3D* param_movement) : GameObject(param_mesh, param_position, param_movement) {
+	StateBox(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) : GameObject(arg_mesh, arg_position, arg_movement) {
 
 	}
 	void run_state() {
@@ -259,16 +314,16 @@ void main()
 	IMesh* mesh_state = myEngine->LoadMesh("state.x");
 
 	// Create thief
-	GameObject* thief = new GameObject(mesh_thief, new Vec3D(0, 1, 10), new Vec3D(0, 0, 0));
+	GameObject* thief = new GameObject(mesh_thief, new Vec2D(0, 1, 10), new Vec2D(0, 0, 0));
 	thief->set_engine(myEngine);
 	thief->SetKeys(Key_Left,Key_Right,Key_Up,Key_Down);
 
 	// Create guard
-	Guard* guard = new Guard(mesh_guard, new Vec3D(0, 0, 0), new Vec3D(0, 0, 0));
+	Guard* guard = new Guard(mesh_guard, new Vec2D(0, 0, 0), new Vec2D(0, 0, 0));
 	guard->create_box(mesh_state);
 
 	// Create state
-	GameObject* state = new GameObject(mesh_state, new Vec3D(0, 2, 0), new Vec3D(0, 0, 0));
+	GameObject* state = new GameObject(mesh_state, new Vec2D(0, 2, 0), new Vec2D(0, 0, 0));
 
 	// Create camera
 	ICamera* camera = myEngine->CreateCamera(kManual,0,10,-10);
