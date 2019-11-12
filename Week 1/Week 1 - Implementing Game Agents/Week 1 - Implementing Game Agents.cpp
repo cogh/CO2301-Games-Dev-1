@@ -3,6 +3,10 @@
 #include <TL-Engine.h>	// TL-Engine include file and namespace
 using namespace tle;
 
+class List {
+	
+};
+
 class Vec3D {
 public:
 	float x;
