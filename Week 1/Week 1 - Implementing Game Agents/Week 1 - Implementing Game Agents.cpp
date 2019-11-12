@@ -139,6 +139,7 @@ public:
 	IModel* model;
 	Vec2D* position;
 	Vec2D* movement;
+	float rotation;
 	EKeyCode key_turn_cw;
 	EKeyCode key_turn_ccw;
 	EKeyCode key_forward;
@@ -177,8 +178,17 @@ public:
 	void MovePosition(Vec2D* arg_position) {
 		position = *position + arg_position;
 	}
+	void RotateToDirection() {
+		rotation = movement->angle_in_degrees();
+	}
+	void RotateToTarget(GameObject* arg_target) {
+		Vec2D* target_vector = *arg_target->position - position;
+		rotation = target_vector->angle_in_degrees();
+	}
 	void UpdateModel() {
-		model->SetPosition(position->x, position->y, position->z);
+		model->SetPosition(position->x, 0, position->y);
+		model->ResetOrientation();
+		model->RotateLocalY(rotation);
 	}
 	void SetKeys(EKeyCode arg_key_left, EKeyCode arg_key_right, EKeyCode arg_key_forward, EKeyCode arg_key_backward) {
 		key_left = arg_key_left;
@@ -311,13 +321,12 @@ void main()
 	IMesh* mesh_state = myEngine->LoadMesh("state.x");
 
 	// Create thief
-	GameObject* thief = new GameObject(mesh_thief, new Vec2D(0, 10), new Vec2D(0, 0));
+	GameObject* thief = new GameObject(mesh_thief, new Vec2D(0, 0), new Vec2D(0, 0));
 	thief->set_engine(myEngine);
 	thief->SetKeys(Key_Left,Key_Right,Key_Up,Key_Down);
 
 	// Create guard
-	Guard* guard = new Guard(mesh_guard, new Vec2D(0, 0), new Vec2D(0, 0));
-	//guard->create_box(mesh_state);
+	GameObject* guard = new GameObject(mesh_guard, new Vec2D(0, 0), new Vec2D(0, 0));
 
 	// Create state
 	StateBox* state = new StateBox(mesh_state, new Vec2D(0, 0), new Vec2D(0, 0));
@@ -341,18 +350,22 @@ void main()
 		// Apply thief movement
 		thief->apply_movement();
 
+		// Apply rotation
+		thief->RotateToDirection();
+		guard->RotateToTarget(thief);
+
 		// Reset thief movement
 		thief->apply_drag();
 
 		// Run
-		guard->run_state();
-		guard->state_box->run_state();
+		//guard->run_state();
+		//guard->state_box->run_state();
 
 		// Update models
 		thief->UpdateModel();
 		guard->UpdateModel();
-		guard->state_box->UpdateModel();
-		state->UpdateModel();
+		//guard->state_box->UpdateModel();
+		//state->UpdateModel();
 
 		// Get distance
 
