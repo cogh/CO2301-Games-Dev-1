@@ -3,10 +3,6 @@
 #include <TL-Engine.h>	// TL-Engine include file and namespace
 using namespace tle;
 
-class List {
-	
-};
-
 class Vec3D {
 public:
 	float x;
@@ -66,6 +62,13 @@ public:
 		y /= get_distance();
 		z /= get_distance();
 	}
+	Vec3D* cross_product(Vec3D* arg_target) {
+		Vec3D* cross_vector;
+		cross_vector->x = y * arg_target->z - arg_target->y * z;
+		cross_vector->y = z * arg_target->x - arg_target->z * x;
+		cross_vector->z = x * arg_target->y - arg_target->x * y;
+		return cross_vector;
+	}
 };
 
 class Vec2D {
@@ -118,8 +121,14 @@ public:
 		x /= get_distance();
 		y /= get_distance();
 	}
-	float dot_product(Vec2D arg_target) {
-		
+	float dot_product(Vec2D* arg_target) {
+		return (x * arg_target->x) + (y * arg_target->y);
+	}
+	float angle_in_radians() {
+		return atan2(x, y);
+	}
+	float angle_in_degrees() {
+		return angle_in_radians() * 180 / 3.14159265359;
 	}
 };
 
@@ -212,68 +221,15 @@ public:
 		state_timer = 0;
 	}
 	void look_at(GameObject* arg_target) {
-		Vec2D* target_direction = (*arg_target->position - position)->normalise;
-		Vec2D* directional_difference = target_direction - ;
-	}
-};
-
-class Guard : public GameObject {
-public:
-	Guard() : GameObject() {
-
-	}
-	Guard(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) : GameObject(arg_mesh, arg_position, arg_movement) {
-
-	}
-	StateBox* state_box;
-	GameObject* target;
-	string idle_skin;
-	string alert_skin;
-	string dead_skin;
-	void run_state() {
-		if (state == "idle") {
-			idle();
-		}
-		if (state == "alert") {
-			alert();
-		}
-		if (state == "dead") {
-			dead();
-		}
-		state_timer++;
-	}
-	void create_box(IMesh* arg_mesh) {
-		state_box = new StateBox(arg_mesh,position,movement);
-	}
-	void set_target(GameObject* arg_target) {
-		target = arg_target;
-	}
-	void idle() {
-		if (state_timer == 0) {
-			model->SetSkin(alert_skin);
-		}
-	}
-	void alert() {
-
-	}
-	void dead() {
-
-	}
-	void set_skins(string arg_idle_skin, string arg_alert_skin, string arg_dead_skin) {
-		idle_skin = arg_idle_skin;
-		alert_skin = arg_alert_skin;
-		dead_skin = arg_dead_skin;
+		Vec2D* target_direction = *arg_target->position - position;
+		target_direction->normalise();
+		float target_angle = target_direction->angle_in_degrees();
 	}
 };
 
 class StateBox : public GameObject {
 public:
-	StateBox() : GameObject() {
-
-	}
-	StateBox(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) : GameObject(arg_mesh, arg_position, arg_movement) {
-
-	}
+	using GameObject::GameObject;
 	void run_state() {
 		if (state == "idle") {
 			idle();
@@ -298,6 +254,47 @@ public:
 	}
 };
 
+class Guard : public GameObject {
+public:
+	using GameObject :: GameObject;
+	StateBox* state_box;
+	GameObject* target;
+	string idle_skin;
+	string alert_skin;
+	string dead_skin;
+	void run_state() {
+		if (state == "idle") {
+			idle();
+		}
+		if (state == "alert") {
+			alert();
+		}
+		if (state == "dead") {
+			dead();
+		}
+		state_timer++;
+	}
+	void set_target(GameObject* arg_target) {
+		target = arg_target;
+	}
+	void idle() {
+		if (state_timer == 0) {
+			model->SetSkin(alert_skin);
+		}
+	}
+	void alert() {
+
+	}
+	void dead() {
+
+	}
+	void set_skins(string arg_idle_skin, string arg_alert_skin, string arg_dead_skin) {
+		idle_skin = arg_idle_skin;
+		alert_skin = arg_alert_skin;
+		dead_skin = arg_dead_skin;
+	}
+};
+
 void main()
 {
 	// Create a 3D engine (using TLX engine here) and open a window for it
@@ -314,16 +311,16 @@ void main()
 	IMesh* mesh_state = myEngine->LoadMesh("state.x");
 
 	// Create thief
-	GameObject* thief = new GameObject(mesh_thief, new Vec2D(0, 1, 10), new Vec2D(0, 0, 0));
+	GameObject* thief = new GameObject(mesh_thief, new Vec2D(0, 10), new Vec2D(0, 0));
 	thief->set_engine(myEngine);
 	thief->SetKeys(Key_Left,Key_Right,Key_Up,Key_Down);
 
 	// Create guard
-	Guard* guard = new Guard(mesh_guard, new Vec2D(0, 0, 0), new Vec2D(0, 0, 0));
-	guard->create_box(mesh_state);
+	Guard* guard = new Guard(mesh_guard, new Vec2D(0, 0), new Vec2D(0, 0));
+	//guard->create_box(mesh_state);
 
 	// Create state
-	GameObject* state = new GameObject(mesh_state, new Vec2D(0, 2, 0), new Vec2D(0, 0, 0));
+	StateBox* state = new StateBox(mesh_state, new Vec2D(0, 0), new Vec2D(0, 0));
 
 	// Create camera
 	ICamera* camera = myEngine->CreateCamera(kManual,0,10,-10);
