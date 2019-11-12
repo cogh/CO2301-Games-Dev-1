@@ -178,8 +178,8 @@ public:
 	void MovePosition(Vec2D* arg_position) {
 		position = *position + arg_position;
 	}
-	void RotateToDirection() {
-		rotation = movement->angle_in_degrees();
+	void RotateToDirection(float arg_angle) {
+		rotation = arg_angle;
 	}
 	void RotateToTarget(GameObject* arg_target) {
 		Vec2D* target_vector = *arg_target->position - position;
@@ -222,8 +222,8 @@ public:
 	void set_engine(I3DEngine* arg_engine) {
 		engine = arg_engine;
 	}
-	int distance_from_object(GameObject* arg_object) {
-		Vec2D* difference_vector = *position - arg_object->position;
+	int distance_from_object(GameObject* arg_target) {
+		Vec2D* difference_vector = *arg_target->position - position;
 		return difference_vector->get_distance();
 	}
 	void change_state(string arg_state) {
@@ -239,7 +239,10 @@ public:
 
 class StateBox : public GameObject {
 public:
-	using GameObject::GameObject;
+	StateBox() : GameObject() {
+	}
+	StateBox(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) : GameObject(arg_mesh, arg_position, arg_movement) {
+	}
 	void run_state() {
 		if (state == "idle") {
 			idle();
@@ -266,7 +269,10 @@ public:
 
 class Guard : public GameObject {
 public:
-	using GameObject :: GameObject;
+	Guard() : GameObject() {
+	}
+	Guard(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) : GameObject(arg_mesh, arg_position, arg_movement) {
+	}
 	StateBox* state_box;
 	GameObject* target;
 	string idle_skin;
@@ -284,16 +290,31 @@ public:
 		}
 		state_timer++;
 	}
+	void change_state(string arg_state) {
+		state = arg_state;
+		state_timer = 0;
+	}
 	void set_target(GameObject* arg_target) {
 		target = arg_target;
 	}
+	void set_state_box(StateBox* arg_state_box) {
+		state_box = arg_state_box;
+	}
 	void idle() {
 		if (state_timer == 0) {
-			model->SetSkin(alert_skin);
+			state_box->model->SetSkin(idle_skin);
 		}
+		if (distance_from_object(target) < 1) {
+			change_state("alert");
+		};
 	}
 	void alert() {
-
+		if (state_timer == 0) {
+			state_box->model->SetSkin(alert_skin);
+		}
+		if (distance_from_object(target) >= 1) {
+			change_state("idle");
+		};
 	}
 	void dead() {
 
@@ -302,6 +323,14 @@ public:
 		idle_skin = arg_idle_skin;
 		alert_skin = arg_alert_skin;
 		dead_skin = arg_dead_skin;
+	}
+};
+
+class Thief : public GameObject {
+public:
+	Thief() : GameObject() {
+	}
+	Thief(IMesh* arg_mesh, Vec2D* arg_position, Vec2D* arg_movement) : GameObject(arg_mesh, arg_position, arg_movement) {
 	}
 };
 
@@ -321,15 +350,18 @@ void main()
 	IMesh* mesh_state = myEngine->LoadMesh("state.x");
 
 	// Create thief
-	GameObject* thief = new GameObject(mesh_thief, new Vec2D(0, 0), new Vec2D(0, 0));
+	Thief* thief = new Thief(mesh_thief, new Vec2D(0, 0), new Vec2D(0, 0));
 	thief->set_engine(myEngine);
 	thief->SetKeys(Key_Left,Key_Right,Key_Up,Key_Down);
 
 	// Create guard
-	GameObject* guard = new GameObject(mesh_guard, new Vec2D(0, 0), new Vec2D(0, 0));
+	Guard* guard = new Guard(mesh_guard, new Vec2D(0, 0), new Vec2D(0, 0));
+	guard->set_skins("blue.PNG","red.PNG","grey.PNG");
+	guard->set_target(thief);
 
-	// Create state
-	StateBox* state = new StateBox(mesh_state, new Vec2D(0, 0), new Vec2D(0, 0));
+	// Create state box
+	StateBox* state_box = new StateBox(mesh_state, new Vec2D(0, 0), new Vec2D(0, 0));
+	guard->set_state_box(state_box);
 
 	// Create camera
 	ICamera* camera = myEngine->CreateCamera(kManual,0,10,-10);
@@ -351,21 +383,20 @@ void main()
 		thief->apply_movement();
 
 		// Apply rotation
-		thief->RotateToDirection();
+		thief->RotateToDirection(thief->movement->angle_in_degrees());
 		guard->RotateToTarget(thief);
 
 		// Reset thief movement
 		thief->apply_drag();
 
 		// Run
-		//guard->run_state();
+		guard->run_state();
 		//guard->state_box->run_state();
 
 		// Update models
 		thief->UpdateModel();
 		guard->UpdateModel();
-		//guard->state_box->UpdateModel();
-		//state->UpdateModel();
+		guard->state_box->UpdateModel();
 
 		// Get distance
 
