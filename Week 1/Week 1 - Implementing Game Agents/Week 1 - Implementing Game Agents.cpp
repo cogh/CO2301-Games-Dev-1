@@ -304,7 +304,7 @@ public:
 		if (state_timer == 0) {
 			state_box->model->SetSkin(idle_skin);
 		}
-		if (distance_from_object(target) < 3) {
+		if (distance_from_object(target) < 12) {
 			change_state("alert");
 		};
 	}
@@ -312,7 +312,7 @@ public:
 		if (state_timer == 0) {
 			state_box->model->SetSkin(alert_skin);
 		}
-		if (distance_from_object(target) >= 3) {
+		if (distance_from_object(target) >= 12) {
 			change_state("idle");
 		};
 	}
@@ -364,7 +364,7 @@ void main()
 	guard->set_state_box(state_box);
 
 	// Create camera
-	ICamera* camera = myEngine->CreateCamera(kManual,0,10,-10);
+	ICamera* camera = myEngine->CreateCamera(kManual,0,20,-20);
 	camera->RotateX(45);
 
 	// Create text
