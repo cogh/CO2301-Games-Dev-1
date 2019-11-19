@@ -151,7 +151,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Vec2D.cpp" />
     <ClCompile Include="Week 8 - Depth-First, Combinatorial Explosion, Heuristics, Hill-climbing.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Vec2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
