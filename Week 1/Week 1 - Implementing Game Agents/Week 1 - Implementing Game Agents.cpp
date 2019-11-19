@@ -115,7 +115,7 @@ public:
 		y -= arg_vector->y;
 	}
 	float get_distance() {
-		return sqrt(x * y);
+		return sqrt(abs(x * x) + (y * y));
 	}
 	void normalise() {
 		x /= get_distance();
@@ -292,7 +292,7 @@ public:
 	}
 	void change_state(string arg_state) {
 		state = arg_state;
-		state_timer = 0;
+		state_timer = -1;
 	}
 	void set_target(GameObject* arg_target) {
 		target = arg_target;
@@ -304,7 +304,7 @@ public:
 		if (state_timer == 0) {
 			state_box->model->SetSkin(idle_skin);
 		}
-		if (distance_from_object(target) < 1) {
+		if (distance_from_object(target) < 12) {
 			change_state("alert");
 		};
 	}
@@ -312,7 +312,7 @@ public:
 		if (state_timer == 0) {
 			state_box->model->SetSkin(alert_skin);
 		}
-		if (distance_from_object(target) >= 1) {
+		if (distance_from_object(target) >= 12) {
 			change_state("idle");
 		};
 	}
@@ -364,8 +364,12 @@ void main()
 	guard->set_state_box(state_box);
 
 	// Create camera
-	ICamera* camera = myEngine->CreateCamera(kManual,0,10,-10);
+	ICamera* camera = myEngine->CreateCamera(kManual,0,20,-20);
 	camera->RotateX(45);
+
+	// Create text
+	IFont* distance_font = myEngine->LoadFont("Comic Sans MS", 36);
+	string distance_text = "";
 
 
 	// The main game loop, repeat until engine is stopped
@@ -391,15 +395,16 @@ void main()
 
 		// Run
 		guard->run_state();
-		//guard->state_box->run_state();
+		guard->state_box->run_state();
 
 		// Update models
 		thief->UpdateModel();
 		guard->UpdateModel();
 		guard->state_box->UpdateModel();
 
-		// Get distance
-
+		// Draw distance text
+		distance_text = to_string(guard->distance_from_object(thief));
+		distance_font->Draw(distance_text,128,128);
 
 		// Close engine
 		if (myEngine->KeyHit(Key_Escape)) {
