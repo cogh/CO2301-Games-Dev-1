@@ -15,11 +15,12 @@ void display_open_list(std::deque<std::unique_ptr<Vec2D>>& arg_list) {
 	}
 }
 
-bool open_list_contains(std::deque<std::unique_ptr<Vec2D>>& arg_list, Vec2D arg_target) {
+bool open_list_contains(std::deque<std::unique_ptr<Vec2D>>& arg_list, std::unique_ptr<Vec2D>& arg_target) {
 	std::deque<std::unique_ptr<Vec2D>>::iterator it;
 	int i = 0;
 	for (auto it = arg_list.begin(); it != arg_list.end(); it++, i++) {
-		if ((*it)->x == arg_target.x && (*it)->y == arg_target.y) {
+		if ((*it)->x == arg_target->x && (*it)->y == arg_target->y) {
+			std::cout << "AAAAAAAAAAA";
 			return true;
 		}
 	}
@@ -85,6 +86,11 @@ void exercise_4() {
 		open_list.push_back(move(current_node));
 	}
 	display_open_list(open_list);
+	current_node.reset(new Vec2D());
+	std::cout << "Open list contains(0,0): " << open_list_contains(open_list, current_node) << "\n";
+	std::cout << "Open list contains(0,1): " << open_list_contains(open_list, current_node) << "\n";
+	std::cout << "Open list contains(1,2): " << open_list_contains(open_list, current_node) << "\n";
+	std::cout << "Open list contains(2,3): " << open_list_contains(open_list, current_node) << "\n";
 	std::cout << "\n";
 	system("pause");
 	system("CLS");
