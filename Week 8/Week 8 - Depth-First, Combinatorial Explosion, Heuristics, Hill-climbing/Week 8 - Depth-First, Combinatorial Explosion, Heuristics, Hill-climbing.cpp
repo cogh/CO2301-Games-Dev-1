@@ -78,26 +78,46 @@ void exercise_3() {
 }
 
 void exercise_4() {
-	std::cout << "Exercise 3 \n";
+	std::cout << "Exercise 4 \n";
 	std::deque<std::unique_ptr<Vec2D>> open_list;
 	std::unique_ptr<Vec2D> current_node;
 	for (int i = 0; i < 10; i++) {
-		current_node.reset(new Vec2D((i * 2 ) + 1, (i * 2) + 2));
+		current_node.reset(new Vec2D(i, i * 2));
 		open_list.push_back(move(current_node));
 	}
 	display_open_list(open_list);
-	current_node.reset(new Vec2D());
+	current_node.reset(new Vec2D(0, 0));
 	std::cout << "Open list contains(0,0): " << open_list_contains(open_list, current_node) << "\n";
-	std::cout << "Open list contains(0,1): " << open_list_contains(open_list, current_node) << "\n";
-	std::cout << "Open list contains(1,2): " << open_list_contains(open_list, current_node) << "\n";
-	std::cout << "Open list contains(2,3): " << open_list_contains(open_list, current_node) << "\n";
+	current_node.reset(new Vec2D(3, 6));
+	std::cout << "Open list contains(3,6): " << open_list_contains(open_list, current_node) << "\n";
+	current_node.reset(new Vec2D(9, 18));
+	std::cout << "Open list contains(9,18): " << open_list_contains(open_list, current_node) << "\n";
+	current_node.reset(new Vec2D(5, 5));
+	std::cout << "Open list contains(5,5): " << open_list_contains(open_list, current_node) << "\n";
 	std::cout << "\n";
 	system("pause");
 	system("CLS");
 }
 
 void exercise_5() {
-
+	std::cout << "Exercise 5 \n";
+	std::deque<std::unique_ptr<Vec2D>> open_list;
+	std::unique_ptr<Vec2D> current_node;
+	current_node.reset(new Vec2D(5,7));
+	open_list.push_back(move(current_node));
+	std::cout << "Front X: " << open_list.front()->x << "\n";
+	std::cout << "Front Y: " << open_list.front()->y << "\n";
+	std::cout << "Back X: " << open_list.back()->x << "\n";
+	std::cout << "Back Y: " << open_list.back()->y << "\n";
+	open_list.pop_front();
+	std::cout << "Pop." << "\n";
+	std::cout << "Front X: " << open_list.front()->x << "\n";
+	std::cout << "Front Y: " << open_list.front()->y << "\n";
+	std::cout << "Back X: " << open_list.back()->x << "\n";
+	std::cout << "Back Y: " << open_list.back()->y << "\n";
+	std::cout << "\n";
+	system("pause");
+	system("CLS");
 }
 
 void exercise_6() {
