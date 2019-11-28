@@ -101,20 +101,35 @@ void exercise_4() {
 
 void exercise_5() {
 	std::cout << "Exercise 5 \n";
-	std::deque<std::unique_ptr<Vec2D>> open_list;
+	std::deque<std::unique_ptr<Vec2D>> test_list;
 	std::unique_ptr<Vec2D> current_node;
 	current_node.reset(new Vec2D(5,7));
-	open_list.push_back(move(current_node));
-	std::cout << "Front X: " << open_list.front()->x << "\n";
-	std::cout << "Front Y: " << open_list.front()->y << "\n";
-	std::cout << "Back X: " << open_list.back()->x << "\n";
-	std::cout << "Back Y: " << open_list.back()->y << "\n";
-	open_list.pop_front();
+	test_list.push_back(move(current_node));
+	std::cout << "Front X: " << test_list.front()->x << "\n";
+	std::cout << "Front Y: " << test_list.front()->y << "\n";
+	std::cout << "Back X: " << test_list.back()->x << "\n";
+	std::cout << "Back Y: " << test_list.back()->y << "\n";
+	test_list.pop_front();
 	std::cout << "Pop." << "\n";
-	std::cout << "Front X: " << open_list.front()->x << "\n";
-	std::cout << "Front Y: " << open_list.front()->y << "\n";
-	std::cout << "Back X: " << open_list.back()->x << "\n";
-	std::cout << "Back Y: " << open_list.back()->y << "\n";
+	//std::cout << "Front X: " << test_list.front()->x << "\n";
+	//std::cout << "Front Y: " << test_list.front()->y << "\n";
+	//std::cout << "Back X: " << test_list.back()->x << "\n";
+	//std::cout << "Back Y: " << test_list.back()->y << "\n";
+	std::deque<std::unique_ptr<Vec2D>> open_list;
+	std::deque<std::unique_ptr<Vec2D>> closed_list;
+	std::cout << "Created open and closed list" << "\n";
+	for (int i = 0; i < 10; i++) {
+		current_node.reset(new Vec2D(i, i * 2));
+		open_list.push_back(move(current_node));
+	}
+	std::cout << "Open list populated" << "\n";
+	display_open_list(open_list);
+	for (auto& element : open_list) {
+		closed_list.push_back(move(element));
+	}
+	std::cout << "Open list entries transferred to closed list" << "\n";
+	display_open_list(closed_list);
+	display_open_list(open_list);
 	std::cout << "\n";
 	system("pause");
 	system("CLS");
