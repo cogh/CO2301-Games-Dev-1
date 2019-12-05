@@ -194,7 +194,39 @@ void exercise_9() {
 }
 
 void exercise_10() {
-
+	std::cout << "Exercise 10 \n";
+	std::deque<std::unique_ptr<Node>> open_list;
+	std::unique_ptr<Node> temp_node(new Node());
+	temp_node.reset(new Node(1, 2, 0));
+	open_list.push_back(move(temp_node));
+	temp_node.reset(new Node(3, 4, 0));
+	open_list.push_back(move(temp_node));
+	temp_node.reset(new Node(5, 6, 0));
+	open_list.push_back(move(temp_node));
+	temp_node.reset(new Node(7, 8, 0));
+	open_list.push_back(move(temp_node));
+	temp_node.reset(new Node(9, 10, 0));
+	open_list.push_back(move(temp_node));
+	std::sort(open_list.begin(), open_list.end(), compare_nodes);
+	std::cout << "Displaying open list: " << "\n";
+	display_open_list(open_list);
+	std::cout << "Erasing element" << "\n";
+	auto p = open_list.begin();
+	while (p != open_list.end())
+	{
+		if ((*p)->x == 3 && (*p)->y == 4)
+		{
+			std::cout << "found" << "\n";
+			open_list.erase(p);
+			break;
+		}
+		p++;
+	}
+	std::cout << "Displaying open list: " << "\n";
+	display_open_list(open_list);
+	std::cout << "\n";
+	system("pause");
+	system("CLS");
 }
 
 

@@ -1,0 +1,9 @@
+
+
+
+
+To do:
+- Make a full class domain diagram
+- Create all classes with blank properties/member functions
+
+small side note: I wanna have a find_index and find_value for lists
