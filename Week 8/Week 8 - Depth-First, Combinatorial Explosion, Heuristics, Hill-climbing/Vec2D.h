@@ -1,11 +1,13 @@
 #pragma once
 
-class Vec2D
+class Node
 {
 public:
 	float x;
 	float y;
-	Vec2D();
-	Vec2D(float arg_x, float arg_y);
+	Node* parent;
+	Node();
+	Node(float arg_x, float arg_y);
+	Node(Node* arg_parent);
 };
 
