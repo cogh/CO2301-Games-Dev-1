@@ -1,0 +1,43 @@
+
+
+
+
+
+random notes on assignment implementation:
+- create a master class for the grid
+- master class for the lists?
+- list class could have a smart pointer just for inserting stuff into the list
+- sort function for lists
+- open and closed list as children of master list class?
+- expand node function
+- pathfinder class could maybe own open and closed list?
+
+
+classes:
+- list
+- closed list :: list
+- open list :: list
+- node
+- grid
+- pathfinder (kind of like an iterator, you could potentially drop it into all sorts of structures I guess)
+- 
+
+Node:
+- base individual unit of data
+- put into lists and grids n shit
+
+List:
+- Highly manipulable list with lots of functions, sorting, etc.
+- holds nodes
+
+Grid:
+- 2D container for nodes
+
+Pathfinder:
+- Has a pointer to a grid
+- Holds open and closed list
+- Open and closed lists hold pointers to nodes
+
+- 
+
+
