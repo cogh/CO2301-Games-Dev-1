@@ -42,7 +42,8 @@ void ConsoleManager::write_prompt()
 
 void ConsoleManager::write_answers()
 {
-    for (int i = 0; i < answer_list.size(); i++) {
+    for (int i = 0; i < answer_list.size(); i++) 
+    {
         cout << i + 1 << ": " << answer_list[i] << endl;
     }
 }
@@ -53,13 +54,15 @@ void ConsoleManager::input_answer()
     bool valid_answer = false;
     string input;
     // Check is numeric
-    while (valid_answer == false) {
+    while (valid_answer == false) 
+    {
         cin >> answer;
         if (answer > 0 && answer <= answer_list.size())
         {
             valid_answer = true;
         }
-        else {
+        else 
+        {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }

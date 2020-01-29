@@ -13,25 +13,21 @@ TerrainMap create_map_from_file(string arg_file_name) {
     TerrainMap map;
     int width;
     int length;
-    ifstream test_file(arg_file_name);
+    ifstream file(arg_file_name);
     char character;
     int entry;
-    test_file >> width;
-    test_file >> length;
+    file >> width;
+    file >> length;
     for (int x = 0; x < width; x++) {
-        deque<ETerrainCost> row;
+        vector<ETerrainCost> row;
         for (int y = 0; y < width; y++) {
             //test_file >> character;
-            test_file >> entry;
+            file >> entry;
             row.push_back((ETerrainCost)entry);
         }
         map.push_back(row);
     }
-    while (!test_file.fail() && !test_file.eof())
-    {
-        test_file >> character;
-        for 
-    }
+    return map;
 }
 
 int main() {
@@ -61,7 +57,7 @@ int main() {
             char character;
             ifstream test_file("mMap.txt");
             while (!test_file.fail() && !test_file.eof())
-            { hv 
+            {
                 test_file >> character;
                 cout << character << endl;
             }
@@ -69,23 +65,17 @@ int main() {
         // Add map
         else if (console_manager.answer == 2)
         {
-            string line;
-            ifstream test_file("mMap.txt");
-            while (!test_file.fail() && !test_file.eof())
-            {
-                test_file >> line;
-                cout << line << endl;
-            }
+            map = create_map_from_file("mMap.txt");
         }
         // Read map
         else if (console_manager.answer == 2)
         {
-            string line;
-            ifstream test_file("mMap.txt");
-            while (!test_file.fail() && !test_file.eof())
+            for (int x = 0; x < map.size(); x++)
             {
-                test_file >> line;
-                cout << line << endl;
+                for (int y = 0; y < map.size(); y++)
+                {
+                    cout << map[x][y];
+                }
             }
         }
         // Exit
