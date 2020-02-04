@@ -71,8 +71,7 @@ void ConsoleManager::input_answer()
 
 void ConsoleManager::stall()
 {
-    string stall;
-    cin >> stall;
+    system("pause");
 }
 
 void ConsoleManager::clear()

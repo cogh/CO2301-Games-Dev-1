@@ -6,24 +6,25 @@
 #include <iostream>
 #include <string>
 #include "ConsoleManager.h"
+#include <sstream>
 
 using namespace std;
 
 TerrainMap create_map_from_file(string arg_file_name) {
     TerrainMap map;
+    ifstream file(arg_file_name);
     int width;
     int length;
-    ifstream file(arg_file_name);
-    char character;
     int entry;
     file >> width;
     file >> length;
+    char character;
     for (int x = 0; x < width; x++) {
         vector<ETerrainCost> row;
-        for (int y = 0; y < width; y++) {
-            //test_file >> character;
-            file >> entry;
-            row.push_back((ETerrainCost)entry);
+        for (int y = 0; y < length; y++) {
+            file >> skipws >> character;
+            entry = character;
+            row.push_back((ETerrainCost)(entry - '0'));
         }
         map.push_back(row);
     }
@@ -56,19 +57,18 @@ int main() {
         {
             char character;
             ifstream test_file("mMap.txt");
-            while (!test_file.fail() && !test_file.eof())
-            {
-                test_file >> character;
-                cout << character << endl;
+            while (test_file >> noskipws >> character) {
+                cout << character; // Or whatever
             }
         }
         // Add map
         else if (console_manager.answer == 2)
         {
             map = create_map_from_file("mMap.txt");
+            cout << "Added.";
         }
         // Read map
-        else if (console_manager.answer == 2)
+        else if (console_manager.answer == 3)
         {
             for (int x = 0; x < map.size(); x++)
             {
@@ -76,10 +76,11 @@ int main() {
                 {
                     cout << map[x][y];
                 }
+                cout << endl;
             }
         }
         // Exit
-        else if (console_manager.answer == 3)
+        else if (console_manager.answer == 4)
         {
             cout << "Exiting" << endl << endl;
             quit = true;
