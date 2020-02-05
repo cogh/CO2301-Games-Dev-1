@@ -2,6 +2,7 @@
 #include "Search.h"
 #include "SearchFactory.h"
 #include "SearchNoStar.h"
+#include "SearchBreadth.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -43,6 +44,7 @@ int main() {
     console_manager.add_answer("Read file");
     console_manager.add_answer("Add map");
     console_manager.add_answer("Read map");
+    console_manager.add_answer("Pathfind");
     console_manager.add_answer("Exit");
 
     // Game loop
@@ -79,8 +81,26 @@ int main() {
                 cout << endl;
             }
         }
-        // Exit
+        // Pathfind
         else if (console_manager.answer == 4)
+        {
+            int startX, startY, endX, endY;
+            cout << "Starting x: ";
+            cin >> startX;
+            cout << "Starting y: ";
+            cin >> startY;
+            cout << "End x: ";
+            cin >> endX;
+            cout << "End y: ";
+            cin >> endY;
+            ISearch* search = new CSearchBreadth();
+            SNode startNode = SNode(startX, startY);
+            SNode endNode = SNode(endX, endY);
+            NodeList path;
+            if (search.FindPath(map, startNode, endNode, path))
+        }
+        // Exit
+        else if (console_manager.answer == 5)
         {
             cout << "Exiting" << endl << endl;
             quit = true;

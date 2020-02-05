@@ -19,6 +19,12 @@ struct SNode
   int y;            // y coordinate
   int score;        // used in more complex algorithms
   SNode* parent = 0; // note use of raw pointer here
+  SNode() {};
+  SNode(int arg_x, int arg_y) 
+  {
+      x = arg_x;
+      y = arg_y;
+  }
 };
 
 // Lists of nodes (e.g Open, Closed and Paths) are implemented as double-ended queues
