@@ -32,6 +32,26 @@ TerrainMap create_map_from_file(string arg_file_name) {
     return map;
 }
 
+void displayNodePath(NodeList &argNodeList) 
+{
+    for (int i = 0; i < argNodeList.size(); i++)
+    {
+        cout << "Node " << i << ": " << argNodeList[i]->x << ", " << argNodeList[i]->y << endl;
+    }
+}
+
+void displayTerrainMap(TerrainMap argTerrainMap) 
+{
+    for (int x = 0; x < argTerrainMap.size(); x++)
+    {
+        for (int y = 0; y < argTerrainMap.size(); y++)
+        {
+            cout << argTerrainMap[x][y];
+        }
+        cout << endl;
+    }
+}
+
 int main() {
     // Create terrain
     TerrainMap map = TerrainMap();
@@ -72,14 +92,7 @@ int main() {
         // Read map
         else if (console_manager.answer == 3)
         {
-            for (int x = 0; x < map.size(); x++)
-            {
-                for (int y = 0; y < map.size(); y++)
-                {
-                    cout << map[x][y];
-                }
-                cout << endl;
-            }
+            displayTerrainMap(map);
         }
         // Pathfind
         else if (console_manager.answer == 4)
@@ -93,11 +106,12 @@ int main() {
             cin >> endX;
             cout << "End y: ";
             cin >> endY;
-            ISearch* search = new CSearchBreadth();
-            SNode startNode = SNode(startX, startY);
-            SNode endNode = SNode(endX, endY);
+            ISearch* search = NewSearch(NoStar);
+            unique_ptr<SNode> startNode(new SNode(startX, startY));
+            unique_ptr<SNode> targetNode(new SNode(endX, endY));
             NodeList path;
-            if (search.FindPath(map, startNode, endNode, path))
+            bool success = search->FindPath(map, move(startNode), move(targetNode), path);
+            displayNodePath(path);
         }
         // Exit
         else if (console_manager.answer == 5)
