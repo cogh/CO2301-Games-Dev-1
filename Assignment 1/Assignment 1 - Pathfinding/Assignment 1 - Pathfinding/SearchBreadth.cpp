@@ -8,6 +8,7 @@
 //         I have implemented it as a pattern for you to follow
 
 #include "SearchBreadth.h" // Declaration of this class
+#include <iostream> // for debugging
 
 /* TODO - Replace this class with classes to implement real search algorithms*/
 
@@ -19,58 +20,94 @@
 bool CSearchBreadth::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique_ptr<SNode> goal, NodeList& path)
 {
     // Add start to open
-    //openList.push_back(start);
+    openList.push_back(move(start));
 
     // Expand adjacents
-    /*while (openList.size() > 0) 
+    while (openList.size() > 0) 
     {
-        //AddAdjacents(openList.back);
-        //closedList.push_back(move(openList.back));
-        //openList.pop_back();
-    }*/
-    // Rather than finding a real path, my made-up No Star algorithm constructs some nodes and calls them a path.
-    unique_ptr <SNode> temp;
-    for (int i = 0; i < 4; i++)
-    {
-        temp.reset(new SNode);
-        temp->x = i;
-        temp->y = i * 2;
-        path.push_back(move(temp));
+        // Check for end
+        if (openList.back() == goal) 
+        {
+            // Add through goal's hierarchy
+            path.push_back(move(openList.back()));
+            while (path.back()->parent != 0) 
+            {
+                unique_ptr<SNode> parentNode;
+                parentNode.reset(move(path.back()->parent));
+                path.push_back(move(parentNode));
+            }
+            return true;
+        }
+        else 
+        {
+            // Open adjacents
+            OpenAdjacents(openList.back(), terrain);
+
+            // Move node from open to closed
+            closedList.push_back(move(openList.back()));
+            cout << "Popping back" << endl;
+            openList.pop_back();
+        }
     }
 
-    return true;
+    return false;
 }
 
-void CSearchBreadth::AddAdjacents(unique_ptr<SNode>& arg_node) 
+void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain)
 {
     // Create temporary SNode pointer
     unique_ptr <SNode> temp;
+    cout << "Opening adjacents for node (x:" << arg_node->x << ", y:" << arg_node->y << ", score:" << arg_node->score << ")" << endl;
 
     // Up
-    /*temp.reset(new SNode);
-    temp->x = arg_node->x;
-    temp->y = arg_node->y + 1;
-    temp->parent = arg_node.get();
-    openList.push_back(move(temp));
+    if (arg_node->y + 1 < 9 && arg_node->upOpened == false) 
+    {
+        cout << "Creating up" << endl;
+        temp.reset(new SNode);
+        temp->x = arg_node->x;
+        temp->y = arg_node->y + 1;
+        temp->score = arg_terrain[temp->x][temp->y];
+        temp->parent = arg_node.get();
+        openList.push_back(move(temp));
+        arg_node->upOpened = true;
+    }
 
     // Right
-    temp.reset(new SNode);
-    temp->x = arg_node->x + 1;
-    temp->y = arg_node->y;
-    temp->parent = arg_node.get();
-    openList.push_back(move(temp));
+    if (arg_node->x + 1 < 9 && arg_node->rightOpened == false)
+    {
+        cout << "Creating right" << endl;
+        temp.reset(new SNode);
+        temp->x = arg_node->x + 1;
+        temp->y = arg_node->y;
+        temp->score = arg_terrain[temp->x][temp->y];
+        temp->parent = arg_node.get();
+        openList.push_back(move(temp));
+        arg_node->rightOpened = true;
+    }
 
     // Down
-    temp.reset(new SNode);
-    temp->x = arg_node->x;
-    temp->y = arg_node->y - 1;
-    temp->parent = arg_node.get();
-    openList.push_back(move(temp));
+    if (arg_node->y - 1 > 0 && arg_node->downOpened == false)
+    {
+        cout << "Creating down" << endl;
+        temp.reset(new SNode);
+        temp->x = arg_node->x;
+        temp->y = arg_node->y - 1;
+        temp->score = arg_terrain[temp->x][temp->y];
+        temp->parent = arg_node.get();
+        openList.push_back(move(temp));
+        arg_node->downOpened = true;
+    }
 
     // Left
-    temp.reset(new SNode);
-    temp->x = arg_node->x - 1;
-    temp->y = arg_node->y;
-    temp->parent = arg_node.get();
-    openList.push_back(move(temp));*/
+    if (arg_node->x - 1 > 0 && arg_node->leftOpened == false)
+    {
+        cout << "Creating left" << endl;
+        temp.reset(new SNode);
+        temp->x = arg_node->x - 1;
+        temp->y = arg_node->y;
+        temp->score = arg_terrain[temp->x][temp->y];
+        temp->parent = arg_node.get();
+        openList.push_back(move(temp));
+        arg_node->leftOpened = true;
+    }
 }

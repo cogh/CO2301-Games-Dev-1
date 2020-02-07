@@ -5,6 +5,7 @@
 //
 
 #include "SearchNoStar.h" // NoStar search class
+#include "SearchBreadth.h"
 
 /* TODO - include each implemented search class here */
 
@@ -17,10 +18,12 @@ ISearch* NewSearch(ESearchType search)
 {
   switch (search)
   {
-    case NoStar:
-      {
-         return new CSearchNoStar();
-      }
+      case NoStar:
+          return new CSearchNoStar();
+          break;
+      case BreadthFirst:
+          return new CSearchBreadth();
+          break;
 
     /* TODO - add a case for each implemented search type here */
 

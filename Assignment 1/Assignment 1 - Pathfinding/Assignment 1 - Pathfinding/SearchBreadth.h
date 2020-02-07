@@ -16,7 +16,7 @@ class CSearchBreadth : public ISearch
 
     // Constructs the path from start to goal for the given terrain
     bool FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique_ptr<SNode> goal, NodeList& path);
-    void AddAdjacents(unique_ptr<SNode>& arg_node);
+    void OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain);
 
     deque<unique_ptr<SNode>> openList;
     deque<unique_ptr<SNode>> closedList;
