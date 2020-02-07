@@ -18,7 +18,8 @@ enum ESearchType
   /* TODO - Add type elements for each implemented search */
 
   NoStar, // Not a real algorithm - remove when ready! 
-  BreadthFirst
+  BreadthFirst,
+  AStar
 };
 
 // Factory function to create CSearchXXX object where XXX is the given search type

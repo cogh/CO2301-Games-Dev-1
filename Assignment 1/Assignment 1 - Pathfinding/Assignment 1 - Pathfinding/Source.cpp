@@ -116,11 +116,12 @@ int main() {
             cin >> endX;
             cout << "End y: ";
             cin >> endY;
-            ISearch* search = NewSearch(BreadthFirst);
+            ISearch* search = NewSearch(AStar);
             unique_ptr<SNode> startNode(new SNode(startX, startY));
             unique_ptr<SNode> targetNode(new SNode(endX, endY));
             NodeList path;
             bool success = search->FindPath(map, move(startNode), move(targetNode), path);
+            cout << "Your node path: " << endl;
             displayNodePath(path);
         }
         // Display coordinate

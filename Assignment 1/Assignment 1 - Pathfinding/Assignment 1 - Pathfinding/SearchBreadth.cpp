@@ -9,6 +9,7 @@
 
 #include "SearchBreadth.h" // Declaration of this class
 #include <iostream> // for debugging
+#include <string>
 
 /* TODO - Replace this class with classes to implement real search algorithms*/
 
@@ -27,15 +28,15 @@ bool CSearchBreadth::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, uniq
     while (openList.size() > 0) 
     {
         // Check for end
-        if (openList.back() == goal) 
+        if (openList.back()->x == goal->x && openList.back()->y == goal->y) 
         {
             // Add through goal's hierarchy
             path.push_back(move(openList.back()));
-            while (path.back()->parent != 0) 
+            while (path.front()->parent != 0) 
             {
                 unique_ptr<SNode> parentNode;
-                parentNode.reset(move(path.back()->parent));
-                path.push_back(move(parentNode));
+                parentNode.reset(move(path.front()->parent));
+                path.push_front(move(parentNode));
             }
             return true;
         }
@@ -45,8 +46,8 @@ bool CSearchBreadth::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, uniq
             OpenAdjacents(openList.back(), terrain);
 
             // Move node from open to closed
+            //cout << "Closing (" << openList.back()->x << ", " << openList.back()->y << ")" << endl;
             closedList.push_back(move(openList.back()));
-            cout << "Popping back" << endl;
             openList.pop_back();
         }
     }
@@ -58,75 +59,87 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
 {
     // Create temporary SNode pointer
     unique_ptr <SNode> temp;
-    cout << "Opening adjacents for new node:" << endl;
-    cout << "   x: " << arg_node->x << endl;
-    cout << "   y: " << arg_node->y << endl;
-    cout << "   score: " << arg_node->score << endl;
-    if (arg_node->parent != 0) {
-        cout << "   parent: (x:" << arg_node->parent->x << ", y:" << arg_node->parent->y << ")" << endl;
-    }
+    //cout << "Opening adjacents for (" << arg_node->x << ", " << arg_node->y << ")" << endl;
 
     // Up
-    if (arg_node->y + 1 < 10 && !arg_node->upOpened) 
+    if (arg_node->y + 1 < 10 && arg_terrain[arg_node->x][arg_node->y] != 0) 
     {
-        cout << "Creating up" << endl;
         temp.reset(new SNode);
         temp->x = arg_node->x;
         temp->y = arg_node->y + 1;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        openList.push_back(move(temp));
-        arg_node->upOpened = true;
+        if (!nodeExists(temp,openList) && !nodeExists(temp,closedList))
+        {
+            openList.push_front(move(temp));
+            //cout << "Creating up" << endl;
+        }
     }
 
     // Right
-    if (arg_node->x + 1 < 10 && !arg_node->rightOpened)
+    if (arg_node->x + 1 < 10 && arg_terrain[arg_node->x][arg_node->y] != 0)
     {
-        cout << "Creating right" << endl;
         temp.reset(new SNode);
         temp->x = arg_node->x + 1;
         temp->y = arg_node->y;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        openList.push_back(move(temp));
-        arg_node->rightOpened = true;
+        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        {
+            openList.push_front(move(temp));
+            //cout << "Creating right" << endl;
+        }
     }
 
     // Down
-    if (arg_node->y - 1 >= 0 && !arg_node->downOpened)
+    if (arg_node->y - 1 >= 0 && arg_terrain[arg_node->x][arg_node->y] != 0)
     {
-        cout << "Creating down" << endl;
         temp.reset(new SNode);
         temp->x = arg_node->x;
         temp->y = arg_node->y - 1;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        openList.push_back(move(temp));
-        arg_node->downOpened = true;
+        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        {
+            openList.push_front(move(temp));
+            //cout << "Creating down" << endl;
+        }
     }
 
     // Left
-    if (arg_node->x - 1 >= 0 && !arg_node->leftOpened)
+    if (arg_node->x - 1 >= 0 && arg_terrain[arg_node->x][arg_node->y] != 0)
     {
-        cout << "Creating left" << endl;
         temp.reset(new SNode);
         temp->x = arg_node->x - 1;
         temp->y = arg_node->y;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        openList.push_back(move(temp));
-        arg_node->leftOpened = true;
+        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        {
+            //cout << "Creating left" << endl;
+            openList.push_front(move(temp));
+        }
     }
 }
 
-void CSearchBreadth::displayTerrainMap(TerrainMap argTerrainMap)
-{
-    for (int x = 0; x < argTerrainMap.size(); x++)
+bool CSearchBreadth::nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList) {
+    for (auto& element : argNodeList)
     {
-        for (int y = 0; y < argTerrainMap.size(); y++)
+        if (element->x == argNode->x && element->y == argNode->y)
         {
-            cout << argTerrainMap[x][y];
+            return true;
         }
-        cout << endl;
     }
+    return false;
+}
+
+unique_ptr<SNode> CSearchBreadth::findNode(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList) {
+    for (auto& element : argNodeList)
+    {
+        if (element->x == argNode->x && element->y == argNode->y)
+        {
+            return move(element);
+        }
+    }
+    return nullptr;
 }

@@ -9,7 +9,7 @@
 /* TODO - Replace this class with classes to implement real search algorithms*/
 
 // Inherit from interface and provide implementation for Breadth algorithm
-class CSearchBreadth : public ISearch
+class CSearchAStar : public ISearch
 {
     // I have not implemented any constructors or destructors.
     // Whether you need some is up to how you choose to do your implementation.
@@ -21,7 +21,13 @@ class CSearchBreadth : public ISearch
     bool nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
     unique_ptr<SNode> findNode(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
 
-	void displayTerrainMap(TerrainMap argTerrainMap);
+    void displayTerrainMap(TerrainMap argTerrainMap);
+
+    int heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target);
+
+    NodeList::iterator findClosestNode(NodeList& argNodeList, unique_ptr<SNode>& argTarget);
+
+    void displayPathfinding(TerrainMap argTerrain);
 
     deque<unique_ptr<SNode>> openList;
     deque<unique_ptr<SNode>> closedList;

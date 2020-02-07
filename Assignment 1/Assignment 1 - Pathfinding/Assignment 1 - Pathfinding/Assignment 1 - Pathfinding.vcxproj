@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleManager.cpp" />
+    <ClCompile Include="SearchAStar.cpp" />
     <ClCompile Include="SearchBreadth.cpp" />
     <ClCompile Include="SearchFactory.cpp" />
     <ClCompile Include="SearchNoStar.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="ConsoleManager.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Search.h" />
+    <ClInclude Include="SearchAStar.h" />
     <ClInclude Include="SearchBreadth.h" />
     <ClInclude Include="SearchFactory.h" />
     <ClInclude Include="SearchNoStar.h" />
