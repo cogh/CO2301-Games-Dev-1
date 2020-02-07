@@ -20,6 +20,7 @@
 bool CSearchBreadth::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique_ptr<SNode> goal, NodeList& path)
 {
     // Add start to open
+    start->parent = 0;
     openList.push_back(move(start));
 
     // Expand adjacents
@@ -57,10 +58,16 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
 {
     // Create temporary SNode pointer
     unique_ptr <SNode> temp;
-    cout << "Opening adjacents for node (x:" << arg_node->x << ", y:" << arg_node->y << ", score:" << arg_node->score << ")" << endl;
+    cout << "Opening adjacents for new node:" << endl;
+    cout << "   x: " << arg_node->x << endl;
+    cout << "   y: " << arg_node->y << endl;
+    cout << "   score: " << arg_node->score << endl;
+    if (arg_node->parent != 0) {
+        cout << "   parent: (x:" << arg_node->parent->x << ", y:" << arg_node->parent->y << ")" << endl;
+    }
 
     // Up
-    if (arg_node->y + 1 < 9 && arg_node->upOpened == false) 
+    if (arg_node->y + 1 < 10 && !arg_node->upOpened) 
     {
         cout << "Creating up" << endl;
         temp.reset(new SNode);
@@ -73,7 +80,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
     }
 
     // Right
-    if (arg_node->x + 1 < 9 && arg_node->rightOpened == false)
+    if (arg_node->x + 1 < 10 && !arg_node->rightOpened)
     {
         cout << "Creating right" << endl;
         temp.reset(new SNode);
@@ -86,7 +93,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
     }
 
     // Down
-    if (arg_node->y - 1 > 0 && arg_node->downOpened == false)
+    if (arg_node->y - 1 >= 0 && !arg_node->downOpened)
     {
         cout << "Creating down" << endl;
         temp.reset(new SNode);
@@ -99,7 +106,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
     }
 
     // Left
-    if (arg_node->x - 1 > 0 && arg_node->leftOpened == false)
+    if (arg_node->x - 1 >= 0 && !arg_node->leftOpened)
     {
         cout << "Creating left" << endl;
         temp.reset(new SNode);
@@ -109,5 +116,17 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
         temp->parent = arg_node.get();
         openList.push_back(move(temp));
         arg_node->leftOpened = true;
+    }
+}
+
+void CSearchBreadth::displayTerrainMap(TerrainMap argTerrainMap)
+{
+    for (int x = 0; x < argTerrainMap.size(); x++)
+    {
+        for (int y = 0; y < argTerrainMap.size(); y++)
+        {
+            cout << argTerrainMap[x][y];
+        }
+        cout << endl;
     }
 }

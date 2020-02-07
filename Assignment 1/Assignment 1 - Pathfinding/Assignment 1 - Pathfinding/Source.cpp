@@ -12,27 +12,35 @@
 using namespace std;
 
 TerrainMap create_map_from_file(string arg_file_name) {
+    // Vars
     TerrainMap map;
     ifstream file(arg_file_name);
     int width;
-    int length;
+    int height;
     int entry;
     file >> width;
-    file >> length;
+    file >> height;
     char character;
+    // Create empty
     for (int x = 0; x < width; x++) {
         vector<ETerrainCost> row;
-        for (int y = 0; y < length; y++) {
-            file >> skipws >> character;
-            entry = character;
-            row.push_back((ETerrainCost)(entry - '0'));
+        for (int y = 0; y < height; y++) {
+            row.push_back((ETerrainCost)0);
         }
         map.push_back(row);
+    }
+    // Assign values
+    for (int y = height-1; y >= 0; y--) {
+        for (int x = 0; x < width; x++) {
+            file >> skipws >> character;
+            entry = character;
+            map[x][y] = (ETerrainCost)(entry - '0');
+        }
     }
     return map;
 }
 
-void displayNodePath(NodeList &argNodeList) 
+void displayNodePath(NodeList& argNodeList)
 {
     for (int i = 0; i < argNodeList.size(); i++)
     {
@@ -40,12 +48,10 @@ void displayNodePath(NodeList &argNodeList)
     }
 }
 
-void displayTerrainMap(TerrainMap argTerrainMap) 
+void displayTerrainMap(TerrainMap argTerrainMap)
 {
-    for (int x = 0; x < argTerrainMap.size(); x++)
-    {
-        for (int y = 0; y < argTerrainMap.size(); y++)
-        {
+    for (int y = argTerrainMap.size() - 1; y >= 0; y--) {
+        for (int x = 0; x < argTerrainMap.size(); x++) {
             cout << argTerrainMap[x][y];
         }
         cout << endl;
@@ -56,6 +62,9 @@ int main() {
     // Create terrain
     TerrainMap map = TerrainMap();
 
+    // Map name
+    string mapName = "mMap.txt";
+
     // Create console manager
     ConsoleManager console_manager;
 
@@ -65,6 +74,7 @@ int main() {
     console_manager.add_answer("Add map");
     console_manager.add_answer("Read map");
     console_manager.add_answer("Pathfind");
+    console_manager.add_answer("Display coordinate");
     console_manager.add_answer("Exit");
 
     // Game loop
@@ -78,7 +88,7 @@ int main() {
         if (console_manager.answer == 1) 
         {
             char character;
-            ifstream test_file("mMap.txt");
+            ifstream test_file(mapName);
             while (test_file >> noskipws >> character) {
                 cout << character; // Or whatever
             }
@@ -86,7 +96,7 @@ int main() {
         // Add map
         else if (console_manager.answer == 2)
         {
-            map = create_map_from_file("mMap.txt");
+            map = create_map_from_file(mapName);
             cout << "Added.";
         }
         // Read map
@@ -113,8 +123,18 @@ int main() {
             bool success = search->FindPath(map, move(startNode), move(targetNode), path);
             displayNodePath(path);
         }
-        // Exit
+        // Display coordinate
         else if (console_manager.answer == 5)
+        {
+            int targetX, targetY;
+            cout << "x: ";
+            cin >> targetX;
+            cout << "y: ";
+            cin >> targetY;
+            cout << "Cost of (" << targetX << ", " << targetY << ")" << map[targetX][targetY] << endl;
+        }
+        // Exit
+        else if (console_manager.answer == 6)
         {
             cout << "Exiting" << endl << endl;
             quit = true;
