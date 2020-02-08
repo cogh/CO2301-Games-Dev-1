@@ -1,3 +1,5 @@
+/*** AARON ARMSTRONG***/
+
 // SearchNoStar.cpp
 // ======^^^^^^====
 //

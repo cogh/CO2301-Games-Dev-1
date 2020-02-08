@@ -1,3 +1,5 @@
+/*** AARON ARMSTRONG***/
+
 #include "ConsoleManager.h"
 #include <string>
 #include <iostream>
