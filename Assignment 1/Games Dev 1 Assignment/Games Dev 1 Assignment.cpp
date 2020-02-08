@@ -23,9 +23,10 @@ public:
 
 class Demo {
 public:
-    Demo(IMesh* argCubeMesh, I3DEngine* argEngine, int argScale)
+    Demo(IMesh* argCubeMesh, IMesh* argArrowMesh, I3DEngine* argEngine, int argScale)
     {
         cubeMesh = argCubeMesh;
+        arrowMesh = argArrowMesh;
         engine = argEngine;
         scale = argScale;
     }
@@ -131,10 +132,10 @@ void main()
 
 	// Meshes
 	IMesh* cubeMesh = myEngine->LoadMesh("Cube.x");
-    IMesh* personMesh = myEngine->LoadMesh("Arrow.x");
+    IMesh* arrowMesh = myEngine->LoadMesh("Arrow.x");
 
     // Demo
-    Demo demo(cubeMesh, myEngine, 10);
+    Demo demo(cubeMesh, arrowMesh, myEngine, 10);
 
 	// Camera
 	ICamera* camera = myEngine->CreateCamera(kManual);
@@ -247,11 +248,12 @@ void main()
             console_manager.clear();
         }
 
+        // Run path
+        demo.runPath();
 
 
 		// Draw the scene
 		myEngine->DrawScene();
-        demo.runPath();
 
 		/**** Update your scene each frame here ****/
 
