@@ -78,11 +78,13 @@ public:
                 terrainGrid[x][y]->model->SetSkin(skinName);
 
                 // Set coordinates
-                terrainGrid[x][y]->model->SetPosition(leftBorder + (x * scale), 0,backBorder + (y * scale));
+                terrainGrid[x][y]->x = leftBorder + (x * scale);
+                terrainGrid[x][y]->y = backBorder + (y * scale);
                 if (argTerrainMap[x][y] == 0)
                 {
                     terrainGrid[x][y]->model->MoveY(-scale);
                 }
+                terrainGrid[x][y]->model->SetPosition(terrainGrid[x][y]->x, 0, terrainGrid[x][y]->y);
             }
             cout << endl;
         }
@@ -91,30 +93,33 @@ public:
     {
         pathPlotter = arrowMesh->CreateModel();
         pathIndex = 0;
-        for (int i = 0; i < argNodeList.size()-1; i++)
+        for (int i = 0; i < argNodeList.size(); i++)
         {
             int x = argNodeList[i]->x;
             int y = argNodeList[i]->y;
             path.push_back(terrainGrid[x][y]);
-            pathPlotter = arrowMesh->CreateModel();
         }
+        pathPlotter->SetY(10);
+        pathPlotter->Scale(0.5);
     }
     void runPath()
     {
-        TLNode* targetNode = path[pathIndex];
-        float xDistance = targetNode->x - pathPlotter->GetX();
-        float yDistance = targetNode->y - pathPlotter->GetY();
+        TLNode targetNode = *path[pathIndex];
+        float xDistance = targetNode.x - pathPlotter->GetX();
+        float zDistance = targetNode.y - pathPlotter->GetZ();
         pathPlotter->MoveX(xDistance * 0.01);
-        pathPlotter->MoveY(yDistance * 0.01);
-        if (xDistance < 0.1 && yDistance < 0.1)
+        pathPlotter->MoveZ(zDistance * 0.01);
+        if (abs(xDistance) < 0.5 && abs(zDistance) < 0.5)
         {
             pathIndex++;
+            cout << pathIndex;
         }
-        if (pathIndex > path.size()-1)
+        if (pathIndex == path.size())
         {
             pathIndex = 0;
+            TLNode resetNode = *path[pathIndex];
+            pathPlotter->SetPosition(resetNode.x, 10, resetNode.y);
         }
-        delete targetNode;
     }
     void clearTerrain(string mapIdentifier);
     void clearPath(string mapIdentifier);
@@ -132,7 +137,7 @@ void main()
 
 	// Meshes
 	IMesh* cubeMesh = myEngine->LoadMesh("Cube.x");
-    IMesh* arrowMesh = myEngine->LoadMesh("Arrow.x");
+    IMesh* arrowMesh = myEngine->LoadMesh("Sphere.x");
 
     // Demo
     Demo demo(cubeMesh, arrowMesh, myEngine, 10);
@@ -145,6 +150,10 @@ void main()
 
     // Create terrain
     TerrainMap map = TerrainMap();
+
+    // Start and end nodes
+    SNode* startNode = new SNode();
+    SNode* endNode = new SNode();
 
     // Create path
     NodeList path;
@@ -162,7 +171,9 @@ void main()
     console_manager.add_answer("Read file");
     console_manager.add_answer("Add map");
     console_manager.add_answer("Read map");
-    console_manager.add_answer("Create path");
+    console_manager.add_answer("Set default coordinates");
+    console_manager.add_answer("Set custom coordinates");
+    console_manager.add_answer("Generate path");
     console_manager.add_answer("Read path");
     console_manager.add_answer("Graphical display");
     console_manager.add_answer("Exit");
@@ -186,13 +197,13 @@ void main()
             if (console_manager.answer == 2)
             {
                 char character;
-                ifstream mapFile(mapIdentifier + "Map.txt.");
+                ifstream mapFile(mapIdentifier + "Map.txt");
                 readFile(mapFile);
             }
             // Add map
             else if (console_manager.answer == 3)
             {
-                ifstream mapFile(mapIdentifier + "Map.txt.");
+                ifstream mapFile(mapIdentifier + "Map.txt");
                 map = create_map_from_file(mapFile);
                 cout << "Added.";
             }
@@ -201,8 +212,22 @@ void main()
             {
                 displayTerrainMap(map);
             }
-            // Create path
+            // Set default coordinates
             else if (console_manager.answer == 5)
+            {
+                ifstream coordsFile(mapIdentifier + "Coords.txt");
+                int coord;
+                coordsFile >> coord;
+                startNode->x = coord;
+                coordsFile >> coord;
+                startNode->y = coord;
+                coordsFile >> coord;
+                endNode->x = coord;
+                coordsFile >> coord;
+                endNode->y = coord;
+            }
+            // Set custom coordinates
+            else if (console_manager.answer == 6)
             {
                 int startX, startY, endX, endY;
                 cout << "Starting x: ";
@@ -213,22 +238,30 @@ void main()
                 cin >> endX;
                 cout << "End y: ";
                 cin >> endY;
+                startNode->x = startX;
+                startNode->y = startY;
+                endNode->x = endX;
+                endNode->y = endY;
+            }
+            // Generate path
+            else if (console_manager.answer == 7)
+            {
                 ISearch* search = NewSearch(AStar);
-                unique_ptr<SNode> startNode(new SNode(startX, startY));
-                unique_ptr<SNode> targetNode(new SNode(endX, endY));
-                bool success = search->FindPath(map, move(startNode), move(targetNode), path);
+                unique_ptr<SNode> searchStartNode(new SNode(startNode->x,startNode->y));
+                unique_ptr<SNode> searchEndNode(new SNode(endNode->x, endNode->y));
+                bool success = search->FindPath(map, move(searchStartNode), move(searchEndNode), path);
                 cout << "Your node path: " << endl;
                 displayNodePath(path);
                 writeNodeListToFile(path, mapIdentifier);
             }
             // Read path
-            else if (console_manager.answer == 6)
+            else if (console_manager.answer == 8)
             {
                 ifstream pathFile(mapIdentifier + "Path.txt");
                 readFile(pathFile);
             }
             // Graphical display
-            else if (console_manager.answer == 7)
+            else if (console_manager.answer == 9)
             {
                 demo.setTerrain(map);
                 demo.setPath(path);
@@ -236,7 +269,7 @@ void main()
                 runConsoleManager = false;
             }
             // Exit
-            else if (console_manager.answer == 8)
+            else if (console_manager.answer == 10)
             {
                 cout << "Exiting" << endl << endl;
                 runConsoleManager = false;
