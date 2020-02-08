@@ -17,6 +17,7 @@ class CSearchAStar : public ISearch
     // Constructs the path from start to goal for the given terrain
     bool FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique_ptr<SNode> goal, NodeList& path);
     void OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain);
+    int iterations = 0;
 
     bool nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
     unique_ptr<SNode> findNode(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);

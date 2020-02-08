@@ -5,7 +5,7 @@
 //
 
 #include "SearchAStar.h" // Declaration of this class
-#include <iostream> // for debugging
+#include <iostream> // for debugging/step display
 #include <string>
 
 
@@ -23,6 +23,8 @@ bool CSearchAStar::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique
     while (openList.size() > 0)
     {
         // Display grid
+        cout << "Iterations: " << iterations << endl;
+        iterations++;
         cout << "Pathfinding grid:" << endl;
         displayPathfinding(terrain);
         // Check for end

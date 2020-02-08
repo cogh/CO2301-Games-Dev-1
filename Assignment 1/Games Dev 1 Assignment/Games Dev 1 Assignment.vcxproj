@@ -125,10 +125,26 @@ copy "C:\ProgramData\TL-Engine\3rd Party\TL-Xtreme\shader\*.*" "$(OutDir)" &gt; 
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConsoleManager.cpp" />
     <ClCompile Include="Games Dev 1 Assignment.cpp" />
+    <ClCompile Include="SearchAStar.cpp" />
+    <ClCompile Include="SearchBreadth.cpp" />
+    <ClCompile Include="SearchFactory.cpp" />
+    <ClCompile Include="SearchNoStar.cpp" />
+    <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConsoleManager.h" />
+    <ClInclude Include="Definitions.h" />
+    <ClInclude Include="Search.h" />
+    <ClInclude Include="SearchAStar.h" />
+    <ClInclude Include="SearchBreadth.h" />
+    <ClInclude Include="SearchFactory.h" />
+    <ClInclude Include="SearchNoStar.h" />
+    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
