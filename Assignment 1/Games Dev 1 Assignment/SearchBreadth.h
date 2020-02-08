@@ -13,6 +13,7 @@ class CSearchBreadth : public ISearch
 {
     // I have not implemented any constructors or destructors.
     // Whether you need some is up to how you choose to do your implementation.
+    int iterations = 0;
 
     // Constructs the path from start to goal for the given terrain
     bool FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique_ptr<SNode> goal, NodeList& path);
@@ -20,6 +21,8 @@ class CSearchBreadth : public ISearch
 
     bool nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
     unique_ptr<SNode> findNode(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
+
+    void displayPathfinding(TerrainMap argTerrain);
 
 	void displayTerrainMap(TerrainMap argTerrainMap);
 

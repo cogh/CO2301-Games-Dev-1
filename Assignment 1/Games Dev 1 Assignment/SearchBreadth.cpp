@@ -27,6 +27,11 @@ bool CSearchBreadth::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, uniq
     // Expand adjacents
     while (openList.size() > 0) 
     {
+        // Display grid
+        cout << "Iterations: " << iterations << endl;
+        iterations++;
+        cout << "Pathfinding grid:" << endl;
+        displayPathfinding(terrain);
         // Check for end
         if (openList.back()->x == goal->x && openList.back()->y == goal->y) 
         {
@@ -142,4 +147,42 @@ unique_ptr<SNode> CSearchBreadth::findNode(unique_ptr<SNode>& argNode, deque<uni
         }
     }
     return nullptr;
+}
+
+void CSearchBreadth::displayPathfinding(TerrainMap argTerrain)
+{
+    // Create empty display grid
+    vector<vector<string>> displayGrid;
+    int width = argTerrain.size();
+    int height = argTerrain.size();
+    for (int x = 0; x < width; x++) {
+        vector<string> row;
+        for (int y = 0; y < height; y++) {
+            row.push_back("-");
+        }
+        displayGrid.push_back(row);
+    }
+
+    // Overwrite with terrain data
+    /*for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            displayGrid[x][y] = to_string(argTerrain[x][y]);
+        }
+    }*/
+
+    // Overwrite with node data
+    for (auto iter = openList.begin(); iter != openList.end(); ++iter) {
+        displayGrid[(*iter)->x][(*iter)->y] = "O";
+    }
+    for (auto iter = closedList.begin(); iter != closedList.end(); ++iter) {
+        displayGrid[(*iter)->x][(*iter)->y] = "X";
+    }
+
+    // Display whole grid
+    for (int y = displayGrid.size() - 1; y >= 0; y--) {
+        for (int x = 0; x < displayGrid.size(); x++) {
+            cout << displayGrid[x][y];
+        }
+        cout << endl;
+    }
 }

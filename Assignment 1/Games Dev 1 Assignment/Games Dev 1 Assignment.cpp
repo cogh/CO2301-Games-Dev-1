@@ -12,6 +12,7 @@
 #include "ConsoleManager.h"
 #include <sstream>
 #include "Utilities.h"
+
 using namespace tle;
 
 class TLNode {
@@ -148,6 +149,9 @@ void main()
 	camera->MoveY(50);
 	camera->RotateX(45);
 
+    // Current algorithm type
+    ESearchType currentAlgorithm = AStar;
+
     // Create terrain
     TerrainMap map = TerrainMap();
 
@@ -177,6 +181,7 @@ void main()
     console_manager.add_answer("Read path");
     console_manager.add_answer("Graphical display");
     console_manager.add_answer("Exit");
+    console_manager.add_answer("Change algorithm");
 
 	// The main game loop, repeat until engine is stopped
 	while (myEngine->IsRunning())
@@ -246,7 +251,7 @@ void main()
             // Generate path
             else if (console_manager.answer == 7)
             {
-                ISearch* search = NewSearch(AStar);
+                ISearch* search = NewSearch(currentAlgorithm);
                 unique_ptr<SNode> searchStartNode(new SNode(startNode->x,startNode->y));
                 unique_ptr<SNode> searchEndNode(new SNode(endNode->x, endNode->y));
                 bool success = search->FindPath(map, move(searchStartNode), move(searchEndNode), path);
@@ -274,6 +279,21 @@ void main()
                 cout << "Exiting" << endl << endl;
                 runConsoleManager = false;
                 myEngine->Stop();
+            }
+            // Switch algorithm
+            else if (console_manager.answer == 11)
+            {
+                switch (currentAlgorithm)
+                {
+                case AStar:
+                    currentAlgorithm = BreadthFirst;
+                    cout << "Switched to breadth first!" << endl;
+                    break;
+                case BreadthFirst:
+                    currentAlgorithm = AStar;
+                    cout << "Switched to A*!" << endl;
+                    break;
+                }
             }
 
             // Stall

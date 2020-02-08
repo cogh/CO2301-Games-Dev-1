@@ -49,7 +49,15 @@ void displayTerrainMap(TerrainMap argTerrainMap)
 void writeNodeListToFile(NodeList& nodeList, string fileName)
 {
     ofstream pathfindFile;
+    // With Path.txt ending
     pathfindFile.open(fileName + "Path.txt");
+    for (int i = 0; i < nodeList.size(); i++)
+    {
+        pathfindFile << "Node " << i << ": " << nodeList[i]->x << ", " << nodeList[i]->y << endl;
+    }
+    pathfindFile.close();
+    // As output.txt
+    pathfindFile.open("output.txt");
     for (int i = 0; i < nodeList.size(); i++)
     {
         pathfindFile << "Node " << i << ": " << nodeList[i]->x << ", " << nodeList[i]->y << endl;
