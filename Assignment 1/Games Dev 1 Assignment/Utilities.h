@@ -23,3 +23,9 @@ void displayTerrainMap(TerrainMap argTerrainMap);
 void writeNodeListToFile(NodeList& argPath, string fileName);
 
 void readFile(ifstream& argFile);
+
+int Heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target);
+
+NodeList::iterator FindClosestNode(NodeList& nodeList, unique_ptr<SNode>& goal);
+
+bool NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);

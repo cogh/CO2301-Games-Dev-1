@@ -21,16 +21,16 @@ class CSearchAStar : public ISearch
     void OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain);
     int iterations = 0;
 
-    bool nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
+    bool NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
     unique_ptr<SNode> findNode(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
 
     void displayTerrainMap(TerrainMap argTerrainMap);
 
-    int heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target);
+    int Heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target);
 
-    NodeList::iterator findClosestNode(NodeList& argNodeList, unique_ptr<SNode>& argTarget);
+    NodeList::iterator FindClosestNode(NodeList& argNodeList, unique_ptr<SNode>& argTarget);
 
-    void displayPathfinding(TerrainMap argTerrain);
+    void DisplayPathfinding(TerrainMap argTerrain);
 
     deque<unique_ptr<SNode>> openList;
     deque<unique_ptr<SNode>> closedList;

@@ -76,7 +76,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
         temp->y = arg_node->y + 1;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp,openList) && !nodeExists(temp,closedList))
+        if (!NodeExists(temp,openList) && !NodeExists(temp,closedList))
         {
             openList.push_front(move(temp));
             //cout << "Creating up" << endl;
@@ -91,7 +91,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
         temp->y = arg_node->y;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
             openList.push_front(move(temp));
             //cout << "Creating right" << endl;
@@ -106,7 +106,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
         temp->y = arg_node->y - 1;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
             openList.push_front(move(temp));
             //cout << "Creating down" << endl;
@@ -121,7 +121,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
         temp->y = arg_node->y;
         temp->score = arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
             //cout << "Creating left" << endl;
             openList.push_front(move(temp));
@@ -129,7 +129,7 @@ void CSearchBreadth::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_t
     }
 }
 
-bool CSearchBreadth::nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList) {
+bool CSearchBreadth::NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList) {
     for (auto& element : argNodeList)
     {
         if (element->x == argNode->x && element->y == argNode->y)

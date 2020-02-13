@@ -74,3 +74,31 @@ void readFile(ifstream& argFile)
         cout << character;
     }
 }
+
+int Heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target)
+{
+    // Get Manhattan distance
+    return origin->score + abs(origin->x - target->x) + abs(origin->y - target->y);
+}
+
+NodeList::iterator FindClosestNode(NodeList& nodeList, unique_ptr<SNode>& goal)
+{
+    auto closestNode = nodeList.begin();
+    for (auto iter = nodeList.begin(); iter != nodeList.end(); ++iter) {
+        if (Heuristic(*iter, goal) < Heuristic(*closestNode, goal)) {
+            closestNode = iter;
+        }
+    }
+    return closestNode;
+}
+
+bool NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList) {
+    for (auto& element : argNodeList)
+    {
+        if (element->x == argNode->x && element->y == argNode->y)
+        {
+            return true;
+        }
+    }
+    return false;
+}

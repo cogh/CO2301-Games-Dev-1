@@ -28,7 +28,7 @@ bool CSearchAStar::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique
         cout << "Iterations: " << iterations << endl;
         iterations++;
         cout << "Pathfinding grid:" << endl;
-        displayPathfinding(terrain);
+        DisplayPathfinding(terrain);
         // Check for end
         if (openList.back()->x == goal->x && openList.back()->y == goal->y)
         {
@@ -45,7 +45,7 @@ bool CSearchAStar::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique
         else
         {
             // Find best node to open
-            NodeList::iterator it = findClosestNode(openList,goal);
+            NodeList::iterator it = FindClosestNode(openList,goal);
 
             // Open adjacents
             OpenAdjacents(*it, terrain);
@@ -74,7 +74,7 @@ void CSearchAStar::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
         temp->y = arg_node->y + 1;
         temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
             openList.push_front(move(temp));
             //cout << "Creating up" << endl;
@@ -89,7 +89,7 @@ void CSearchAStar::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
         temp->y = arg_node->y;
         temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
             openList.push_front(move(temp));
             //cout << "Creating right" << endl;
@@ -104,7 +104,7 @@ void CSearchAStar::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
         temp->y = arg_node->y - 1;
         temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
             openList.push_front(move(temp));
             //cout << "Creating down" << endl;
@@ -119,7 +119,7 @@ void CSearchAStar::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
         temp->y = arg_node->y;
         temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
         temp->parent = arg_node.get();
-        if (!nodeExists(temp, openList) && !nodeExists(temp, closedList))
+        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
             //cout << "Creating left" << endl;
             openList.push_front(move(temp));
@@ -127,7 +127,7 @@ void CSearchAStar::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
     }
 }
 
-bool CSearchAStar::nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList) {
+bool CSearchAStar::NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList) {
     for (auto& element : argNodeList)
     {
         if (element->x == argNode->x && element->y == argNode->y)
@@ -149,22 +149,23 @@ unique_ptr<SNode> CSearchAStar::findNode(unique_ptr<SNode>& argNode, deque<uniqu
     return nullptr;
 }
 
-int CSearchAStar::heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target) {
+int CSearchAStar::Heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target) 
+{
     // Get Manhattan distance
     return origin->score + abs(origin->x - target->x) + abs(origin->y - target->y);
 }
 
-NodeList::iterator CSearchAStar::findClosestNode(NodeList& argNodeList, unique_ptr<SNode>& argTarget) {
+NodeList::iterator CSearchAStar::FindClosestNode(NodeList& argNodeList, unique_ptr<SNode>& argTarget) {
     auto closestNode = argNodeList.begin();
     for (auto iter = argNodeList.begin(); iter != argNodeList.end(); ++iter) {
-        if (heuristic(*iter, argTarget) < heuristic(*closestNode, argTarget)) {
+        if (Heuristic(*iter, argTarget) < Heuristic(*closestNode, argTarget)) {
             closestNode = iter;
         }
     }
     return closestNode;
 }
 
-void CSearchAStar::displayPathfinding(TerrainMap argTerrain) 
+void CSearchAStar::DisplayPathfinding(TerrainMap argTerrain) 
 {
     // Create empty display grid
     vector<vector<string>> displayGrid;

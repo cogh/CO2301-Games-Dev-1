@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -127,6 +127,7 @@ copy "C:\ProgramData\TL-Engine\3rd Party\TL-Xtreme\shader\*.*" "$(OutDir)" &gt; 
   <ItemGroup>
     <ClCompile Include="ConsoleManager.cpp" />
     <ClCompile Include="Games Dev 1 Assignment.cpp" />
+    <ClCompile Include="PathfindDemo.cpp" />
     <ClCompile Include="SearchAStar.cpp" />
     <ClCompile Include="SearchBreadth.cpp" />
     <ClCompile Include="SearchFactory.cpp" />
@@ -139,6 +140,8 @@ copy "C:\ProgramData\TL-Engine\3rd Party\TL-Xtreme\shader\*.*" "$(OutDir)" &gt; 
   <ItemGroup>
     <ClInclude Include="ConsoleManager.h" />
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="Games Dev 1 Assignment.h" />
+    <ClInclude Include="PathfindDemo.h" />
     <ClInclude Include="Search.h" />
     <ClInclude Include="SearchAStar.h" />
     <ClInclude Include="SearchBreadth.h" />

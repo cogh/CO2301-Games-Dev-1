@@ -14,128 +14,17 @@
 #include "ConsoleManager.h"
 #include <sstream>
 #include "Utilities.h"
+#include "PathfindDemo.h"
 
 using namespace tle;
 
-class TLNode {
+class TLNode 
+{
 public:
     IModel* model;
     int x;
     int y;
 };
-
-class Demo {
-public:
-    Demo(IMesh* argCubeMesh, IMesh* argArrowMesh, I3DEngine* argEngine, int argScale)
-    {
-        cubeMesh = argCubeMesh;
-        arrowMesh = argArrowMesh;
-        engine = argEngine;
-        scale = argScale;
-    }
-    int scale;
-    I3DEngine* engine;
-    IMesh* cubeMesh;
-    IMesh* arrowMesh;
-    vector<vector<TLNode*>> terrainGrid;
-    vector<TLNode*> path;
-    IModel* pathPlotter;
-    int pathIndex;
-    void setTerrain(TerrainMap argTerrainMap)
-    {
-        int mapSize = argTerrainMap.size();
-        int leftBorder = -(mapSize * scale / 2);
-        int backBorder = -(mapSize * scale / 2);
-        // Expand map
-        for (int y = mapSize - 1; y >= 0; y--) {
-            vector<TLNode*> row;
-            for (int x = 0; x < mapSize; x++) {
-                TLNode* node = new TLNode();
-                node->model = cubeMesh->CreateModel();
-                row.push_back(node);
-            }
-            terrainGrid.push_back(row);
-            cout << endl;
-        }
-        // Initialise TLNodes
-        for (int y = mapSize - 1; y >= 0; y--) {
-            for (int x = 0; x < mapSize; x++)
-            {
-                // Set skin
-                string skinName;
-                switch (argTerrainMap[x][y])
-                {
-                    case 0:
-                        skinName = "Sun.jpg";
-                        break;
-                    case 1:
-                        skinName = "wood1.jpg";
-                        break;
-                    case 2:
-                        skinName = "CueTip.jpg";
-                        break;
-                    case 3:
-                        skinName = "Grass1.jpg";
-                        break;
-                }
-                terrainGrid[x][y]->model->SetSkin(skinName);
-
-                // Set coordinates
-                terrainGrid[x][y]->x = leftBorder + (x * scale);
-                terrainGrid[x][y]->y = backBorder + (y * scale);
-                if (argTerrainMap[x][y] == 0)
-                {
-                    terrainGrid[x][y]->model->MoveY(-scale);
-                }
-                terrainGrid[x][y]->model->SetPosition(terrainGrid[x][y]->x, 0, terrainGrid[x][y]->y);
-            }
-            cout << endl;
-        }
-    }
-    void setPath(NodeList& argNodeList)
-    {
-        pathPlotter = arrowMesh->CreateModel();
-        pathIndex = 0;
-        int mapSize = terrainGrid.size();
-        int leftBorder = -(mapSize * scale / 2);
-        int backBorder = -(mapSize * scale / 2);
-        for (int i = 0; i < argNodeList.size(); i++)
-        {
-            int x = argNodeList[i]->x;
-            int y = argNodeList[i]->y;
-            path.push_back(terrainGrid[x][y]);
-            IModel* pathfindNode = arrowMesh->CreateModel();
-            pathfindNode->Scale(0.3);
-            pathfindNode->SetX(leftBorder + (x * scale));
-            pathfindNode->SetY(10);
-            pathfindNode->SetZ(backBorder + (y * scale));
-        }
-        pathPlotter->SetY(10);
-        pathPlotter->Scale(0.5);
-    }
-    void runPath()
-    {
-        TLNode targetNode = *path[pathIndex];
-        float xDistance = targetNode.x - pathPlotter->GetX();
-        float zDistance = targetNode.y - pathPlotter->GetZ();
-        pathPlotter->MoveX(xDistance * 0.01);
-        pathPlotter->MoveZ(zDistance * 0.01);
-        if (abs(xDistance) < 0.5 && abs(zDistance) < 0.5)
-        {
-            pathIndex++;
-            cout << pathIndex;
-        }
-        if (pathIndex == path.size())
-        {
-            pathIndex = 0;
-            TLNode resetNode = *path[pathIndex];
-            pathPlotter->SetPosition(resetNode.x, 10, resetNode.y);
-        }
-    }
-    void clearTerrain(string mapIdentifier);
-    void clearPath(string mapIdentifier);
-};
-
 
 void main()
 {
@@ -151,12 +40,15 @@ void main()
     IMesh* arrowMesh = myEngine->LoadMesh("Sphere.x");
 
     // Demo
-    Demo demo(cubeMesh, arrowMesh, myEngine, 10);
+    PathfindDemo demo = PathfindDemo(cubeMesh, 10);
+    demo.SetCoordsFromFile("m");
+    demo.SetTerrainMapFromFile("m");
+    demo.StartSearch();
 
 	// Camera
 	ICamera* camera = myEngine->CreateCamera(kManual);
-	camera->MoveZ(-50);
-	camera->MoveY(50);
+	camera->MoveZ(-100);
+	camera->MoveY(100);
 	camera->RotateX(45);
 
     // Current algorithm type
@@ -197,7 +89,7 @@ void main()
 	while (myEngine->IsRunning())
 	{
         // Run console
-        while (runConsoleManager)
+        /*while (runConsoleManager)
         {
             // Get answer
             console_manager.run();
@@ -309,10 +201,14 @@ void main()
             // Stall
             console_manager.stall();
             console_manager.clear();
-        }
+        }*/
 
         // Run path
-        demo.runPath();
+        if (demo.searchActive == true)
+        {
+            demo.ContinueSearch();
+            demo.UpdateDisplay();
+        }
 
 
 		// Draw the scene

@@ -21,7 +21,7 @@ class CSearchBreadth : public ISearch
     bool FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique_ptr<SNode> goal, NodeList& path);
     void OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain);
 
-    bool nodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
+    bool NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
     unique_ptr<SNode> findNode(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
 
     void displayPathfinding(TerrainMap argTerrain);
