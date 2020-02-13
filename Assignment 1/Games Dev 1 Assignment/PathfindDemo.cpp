@@ -52,32 +52,64 @@ void PathfindDemo::SetCoordsFromFile(string mapIdentifier)
 
 void PathfindDemo::InstantiateModelsFromTerrainMap(TerrainMap argTerrainMap)
 {
+	string skin;
+	int modelX;
+	int modelY;
+	int modelZ;
     for (int x = 0; x < argTerrainMap.size(); x++)
     {
         for (int y = 0; y < argTerrainMap[0].size(); y++)
         {
+			modelX = x * scale;
+			modelY = 0;
+			modelZ = y * scale;
+			switch (argTerrainMap[x][y]) 
+			{
+			case 0:
+				skin = "brick1.jpg";
+				modelY += scale;
+				break;
+			case 1:
+				skin = "Grass1.jpg";
+				break;
+			case 2:
+				skin = "Grey.jpg";
+				break;
+			case 3:
+				skin = "Neptune.jpg";
+				break;
+			}
             IModel* model = cubeMesh->CreateModel();
-            model->SetSkin("brick1.jpg");
-            model->SetPosition(x * scale, 0, y * scale);
+            model->SetSkin(skin);
+            model->SetPosition(modelX, modelY, modelZ);
         }
     }
 }
 
 void PathfindDemo::InstantiateModelsFromNodeList(NodeList& argNodeList, IMesh* mesh, string skin)
 {
-    for (auto& node : argNodeList)
-    {
-        if (node != nullptr)
-        {
-            int x = node->x * scale;
-            int y = scale;
-            int z = node->y * scale;
-            cout << "creating model at (x: " << x << ", y: " << y << ", z: " << z << ")" << endl;
-            IModel* model = mesh->CreateModel();
-            model->SetSkin(skin);
-            model->SetPosition(x, y, z);
-        }
-    }
+	for (auto& node : argNodeList)
+	{
+		if (node != nullptr)
+		{
+			int x = node->x * scale;
+			int y = scale;
+			int z = node->y * scale;
+			IModel* model = mesh->CreateModel();
+			model->SetSkin(skin);
+			model->SetPosition(x, y, z);
+		}
+	}
+}
+
+void PathfindDemo::InstantiateModelsFromNode(unique_ptr<SNode>& node, IMesh* mesh, string skin)
+{
+	int x = node->x * scale;
+	int y = scale;
+	int z = node->y * scale;
+	IModel* model = mesh->CreateModel();
+	model->SetSkin(skin);
+	model->SetPosition(x, y, z);
 }
 
 void PathfindDemo::ClearModelList(vector<IModel*> modelList)
@@ -93,8 +125,9 @@ void PathfindDemo::StartSearch()
 	// Add start to open
 	start->parent = 0;
 	openList.push_back(move(start));
-    leftBorder = -(terrainMap.size() * scale / 2);
-    backBorder = -(terrainMap[0].size() * scale / 2);
+	leftBorder = -20;
+	backBorder = -20;
+    //backBorder = -(terrainMap[0].size() * scale / 2);
 	searchActive = true;
 }
 
@@ -147,7 +180,10 @@ void PathfindDemo::UpdateDisplay()
     ClearModelList(closedListModels);
     InstantiateModelsFromNodeList(openList, cubeMesh, "Baize.jpg");
     InstantiateModelsFromNodeList(closedList, cubeMesh, "BaizeDark.jpg");
-    InstantiateModelsFromTerrainMap(terrainMap);
+	InstantiateModelsFromTerrainMap(terrainMap);
+	InstantiateModelsFromNode(start, cubeMesh, "Violet.PNG");
+	InstantiateModelsFromNode(goal, cubeMesh, "Sun.jpg");
+	DisplayPathfinding(terrainMap);
 }
 
 void PathfindDemo::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain)
@@ -215,4 +251,44 @@ void PathfindDemo::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
             openList.push_front(move(temp));
         }
     }
+}
+
+void PathfindDemo::DisplayPathfinding(TerrainMap argTerrain)
+{
+	// Create empty display grid
+	system("CLS");
+	cout << "Iteration: " << iterations << endl;
+	vector<vector<string>> displayGrid;
+	int width = argTerrain.size();
+	int height = argTerrain.size();
+	for (int x = 0; x < width; x++) {
+		vector<string> row;
+		for (int y = 0; y < height; y++) {
+			row.push_back("-");
+		}
+		displayGrid.push_back(row);
+	}
+
+	// Overwrite with terrain data
+	/*for (int x = 0; x < width; x++) {
+		for (int y = 0; y < height; y++) {
+			displayGrid[x][y] = to_string(argTerrain[x][y]);
+		}
+	}*/
+
+	// Overwrite with node data
+	for (auto iter = openList.begin(); iter != openList.end(); ++iter) {
+		displayGrid[(*iter)->x][(*iter)->y] = "O";
+	}
+	for (auto iter = closedList.begin(); iter != closedList.end(); ++iter) {
+		displayGrid[(*iter)->x][(*iter)->y] = "X";
+	}
+
+	// Display whole grid
+	for (int y = displayGrid.size() - 1; y >= 0; y--) {
+		for (int x = 0; x < displayGrid.size(); x++) {
+			cout << displayGrid[x][y];
+		}
+		cout << endl;
+	}
 }

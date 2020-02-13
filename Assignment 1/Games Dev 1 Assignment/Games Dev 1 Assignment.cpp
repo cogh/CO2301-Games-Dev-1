@@ -47,9 +47,10 @@ void main()
 
 	// Camera
 	ICamera* camera = myEngine->CreateCamera(kManual);
-	camera->MoveZ(-100);
+	camera->MoveZ(75);
 	camera->MoveY(100);
-	camera->RotateX(45);
+	camera->MoveX(50);
+	camera->RotateX(90);
 
     // Current algorithm type
     ESearchType currentAlgorithm = AStar;

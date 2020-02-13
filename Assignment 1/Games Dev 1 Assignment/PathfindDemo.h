@@ -22,6 +22,7 @@ public:
     void SetCoordsFromFile(string mapIdentifier);
     void InstantiateModelsFromTerrainMap(TerrainMap argTerrainMap);
     void InstantiateModelsFromNodeList(NodeList& argNodeList, IMesh* mesh, string skin);
+	void InstantiateModelsFromNode(unique_ptr<SNode>& node, IMesh* mesh, string skin);
     bool searchActive;
     int iterations;
     int scale;
@@ -42,5 +43,6 @@ public:
     void ContinueSearch();
     void UpdateDisplay();
     void OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain);
+	void DisplayPathfinding(TerrainMap argTerrain);
 };
 
