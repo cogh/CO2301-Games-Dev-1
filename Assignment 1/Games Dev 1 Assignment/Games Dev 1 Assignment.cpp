@@ -41,9 +41,9 @@ void main()
 
     // Demo
     PathfindDemo demo = PathfindDemo(cubeMesh, 10);
-    demo.SetCoordsFromFile("m");
-    demo.SetTerrainMapFromFile("m");
-    demo.StartSearch();
+
+    // Time
+    float time = 1;
 
 	// Camera
 	ICamera* camera = myEngine->CreateCamera(kManual);
@@ -89,7 +89,7 @@ void main()
 	while (myEngine->IsRunning())
 	{
         // Run console
-        /*while (runConsoleManager)
+        while (runConsoleManager)
         {
             // Get answer
             console_manager.run();
@@ -170,9 +170,11 @@ void main()
             // Graphical display
             else if (console_manager.answer == 9)
             {
-                demo.setTerrain(map);
-                demo.setPath(path);
-                cout << "Exiting" << endl << endl;
+                demo.SetCoordsFromFile(mapIdentifier);
+                demo.goal->x = startNode->x;
+                demo.goal->y = endNode->y;
+                demo.SetTerrainMapFromFile(mapIdentifier);
+                demo.StartSearch();
                 runConsoleManager = false;
             }
             // Exit
@@ -201,13 +203,17 @@ void main()
             // Stall
             console_manager.stall();
             console_manager.clear();
-        }*/
+        }
+    
+        // TIme
+        time -= myEngine->Timer();
 
         // Run path
-        if (demo.searchActive == true)
+        if (demo.searchActive == true && time <= 0)
         {
             demo.ContinueSearch();
             demo.UpdateDisplay();
+            time = 1.0f;
         }
 
 

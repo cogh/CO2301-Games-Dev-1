@@ -147,6 +147,7 @@ void PathfindDemo::UpdateDisplay()
     ClearModelList(closedListModels);
     InstantiateModelsFromNodeList(openList, cubeMesh, "Baize.jpg");
     InstantiateModelsFromNodeList(closedList, cubeMesh, "BaizeDark.jpg");
+    InstantiateModelsFromTerrainMap(terrainMap);
 }
 
 void PathfindDemo::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain)
