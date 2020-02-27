@@ -26,7 +26,7 @@ struct SNode
   bool leftOpened = false;
   bool rightOpened = false;
   SNode() {};
-  SNode(int arg_x, int arg_y) 
+  SNode(int arg_x, int arg_y)
   {
       x = arg_x;
       y = arg_y;

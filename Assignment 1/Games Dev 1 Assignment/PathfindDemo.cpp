@@ -339,9 +339,13 @@ void PathfindDemo::ContinueSearch()
             OpenAdjacents(*it, terrainMap);
 
             // Move node from open to closed
-            //cout << "Closing (" << openList.back()->x << ", " << openList.back()->y << ")" << endl;
             closedList.push_back(move(openList.back()));
             openList.pop_back();
+            /*unique_ptr<SNode> tmp(new SNode());
+            tmp->x = (*it)->x;
+            tmp->y = (*it)->y;
+            closedList.push_back(move(tmp));
+            openList.erase(it);*/
         }
     }
     else

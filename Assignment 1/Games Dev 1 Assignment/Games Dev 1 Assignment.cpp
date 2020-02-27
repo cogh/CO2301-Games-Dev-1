@@ -26,7 +26,7 @@ public:
     int y;
 };
 
-/*class PathPlotter
+class PathPlotter
 {
 public:
     IMesh* mMesh;
@@ -39,38 +39,58 @@ public:
     {
         mMesh = mesh;
         mModel = mesh->CreateModel();
+        mModel->Scale(0.5);
+        mModel->MoveY(scale*2);
         mScale = scale;
-        mTargetIndex = mPath.begin();
         running = false;
     }
-    void SetPath(NodeList path)
+    void CopyPath(NodeList& path)
     {
-        mPath = path;
+        for (auto& node : path)
+        {
+            mPath.push_back(move(node));
+        }
+        mTargetIndex = mPath.begin();
+        SNode target = **mTargetIndex;
+        mModel->SetX(target.x * mScale);
+        mModel->SetZ(target.y * mScale);
     }
     void Run(float deltaTime)
     {
         float distance = DistanceToNextNode();
-        if (distance < mScale)
+        if (distance > 5.0f)
         {
             SNode target = **mTargetIndex;
-            float xDif = target.x - mModel->GetX();
-            float yDif = target.y - mModel->GetY();
-            mModel->MoveX(xDif / distance * mScale * deltaTime);
-            mModel->MoveY(yDif / distance * mScale * deltaTime);
+            float xDif = (target.x * mScale) - mModel->GetX();
+            float zDif = (target.y * mScale) - mModel->GetZ();
+            mModel->MoveX(xDif * 0.03);
+            mModel->MoveZ(zDif * 0.03);
         }
         else
         {
-            mTargetIndex++;
+            NodeList::iterator mNextTargetIndex = mTargetIndex;
+            mNextTargetIndex++;
+            if (mNextTargetIndex != mPath.end())
+            {
+                mTargetIndex = mNextTargetIndex;
+            }
+            else
+            {
+                mTargetIndex = mPath.begin();
+                SNode target = **mTargetIndex;
+                mModel->SetX(target.x * mScale);
+                mModel->SetZ(target.y * mScale);
+            }
         }
     }
     float DistanceToNextNode()
     {
         SNode target = **mTargetIndex;
-        float xDif = target.x - mModel->GetX();
-        float yDif = target.y - mModel->GetY();
-        return abs((sqrt((xDif * xDif) + (yDif * yDif))));
+        float xDif = (target.x * mScale) - mModel->GetX();
+        float zDif = (target.y * mScale) - mModel->GetZ();
+        return abs((sqrt((xDif * xDif) + (zDif * zDif))));
     }
-};*/
+};
 
 void main()
 {
@@ -89,7 +109,7 @@ void main()
 
     // Demo
     PathfindDemo demo = PathfindDemo(cubeMesh, bushMesh, 10);
-    //PathPlotter pathPlotter = PathPlotter(sphereMesh, 10);
+    PathPlotter pathPlotter = PathPlotter(sphereMesh, 10);
 
 
     // Time
@@ -260,7 +280,7 @@ void main()
         }
     
         // Time
-        time -= myEngine->Timer();
+        time -= myEngine->Timer()*5;
         float deltaTime = myEngine->Timer();
 
         // Run path
@@ -275,24 +295,21 @@ void main()
         }
         else // reset to console
         {
-            demo.openList.clear();
-            demo.closedList.clear();
-            //demo.path.clear();
-            //runConsoleManager = true;
-            /*if (pathPlotter.running == false)
+            if (pathPlotter.running == false)
             {
-                // Copy path
-                for (int i = 0; i < demo.path.size(); i++)
-                {
-                    pathPlotter.mPath.push_back(move(demo.path[i]));
-                }
+                // Set target node iterator
+                pathPlotter.CopyPath(demo.path);
                 // Set running
                 pathPlotter.running = true;
             }
             else
             {
                 pathPlotter.Run(deltaTime);
-            }*/
+            }
+            //demo.openList.clear();
+            //demo.closedList.clear();
+            //demo.path.clear();
+            //runConsoleManager = true;
             cout << endl << "Search complete. Define new search?" << endl;
         }
 
