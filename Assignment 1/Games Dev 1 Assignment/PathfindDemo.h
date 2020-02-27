@@ -42,7 +42,10 @@ public:
     vector<IModel*> terrainMapModels;
     vector<IModel*> pathModels;
     void ClearModelList(vector<IModel*> modelList);
-    void StartSearch();
+	void OpenAdjacents(NodeList::iterator arg_node_iterator, TerrainMap arg_terrain);
+	void OpenAdjacents(SNode& arg_node, TerrainMap arg_terrain);
+	NodeList GetAdjacents(NodeList::iterator nodelist_iterator, TerrainMap arg_terrain);
+	void StartSearch();
     void ContinueSearch();
     void UpdateDisplay();
     void ClearModels();

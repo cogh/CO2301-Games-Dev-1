@@ -19,8 +19,8 @@ struct SNode
 {
   int x;            // x coordinate
   int y;            // y coordinate
-  int score;        // used in more complex algorithms
   SNode* parent = 0; // note use of raw pointer here
+  int score;        // used in more complex algorithms
   bool upOpened = false;
   bool downOpened = false;
   bool leftOpened = false;

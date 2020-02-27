@@ -218,71 +218,71 @@ void PathfindDemo::DisplayPathfinding(TerrainMap argTerrain)
 
 ////////  PATHFINDING FUNCTIONS  ////////
 
-void PathfindDemo::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain)
+NodeList PathfindDemo::GetAdjacents(NodeList::iterator nodelist_iterator, TerrainMap arg_terrain)
 {
-    // Create temporary SNode pointer
-    unique_ptr <SNode> temp;
-    //cout << "Opening adjacents for (" << arg_node->x << ", " << arg_node->y << ")" << endl;
+	// Create adjacent list
+	NodeList adjacentList;
+
+    // Create original position node pointer
+	unique_ptr<SNode> original(new SNode());
+	original->x = (*nodelist_iterator)->x;
+	original->y = (*nodelist_iterator)->y;
+	original->score = (*nodelist_iterator)->score;
+	original->parent = (*nodelist_iterator)->parent;
+
+	// Create temporary node pointer for new nodes
+    unique_ptr <SNode> temp(new SNode());
 
     // Up
-    if (arg_node->y + 1 < 10 && arg_terrain[arg_node->x][arg_node->y + 1] != 0)
+    if (original->y + 1 < 10 && arg_terrain[original->x][original->y + 1] != 0)
     {
-        temp.reset(new SNode);
-        temp->x = arg_node->x;
-        temp->y = arg_node->y + 1;
-        temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
-        temp->parent = arg_node.get();
+        temp.reset(new SNode(original->x,original->y+1));
+        temp->score = original->score + arg_terrain[temp->x][temp->y];
+        temp->parent = (*nodelist_iterator).get();
         if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
-            openList.push_front(move(temp));
-            //cout << "Creating up" << endl;
+			adjacentList.push_front(move(temp));
         }
     }
 
     // Right
-    if (arg_node->x + 1 < 10 && arg_terrain[arg_node->x + 1][arg_node->y] != 0)
-    {
-        temp.reset(new SNode);
-        temp->x = arg_node->x + 1;
-        temp->y = arg_node->y;
-        temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
-        temp->parent = arg_node.get();
-        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
-        {
-            openList.push_front(move(temp));
-            //cout << "Creating right" << endl;
-        }
-    }
+	if (original->x + 1 < 10 && arg_terrain[original->x+1][original->y] != 0)
+	{
+		temp.reset(new SNode(original->x + 1, original->y));
+		temp->score = original->score + arg_terrain[temp->x][temp->y];
+		temp->parent = (*nodelist_iterator).get();
+		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
+		{
+			adjacentList.push_front(move(temp));
+		}
+	}
 
     // Down
-    if (arg_node->y - 1 >= 0 && arg_terrain[arg_node->x][arg_node->y - 1] != 0)
-    {
-        temp.reset(new SNode);
-        temp->x = arg_node->x;
-        temp->y = arg_node->y - 1;
-        temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
-        temp->parent = arg_node.get();
-        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
-        {
-            openList.push_front(move(temp));
-            //cout << "Creating down" << endl;
-        }
-    }
+	if (original->y - 1 >= 0 && arg_terrain[original->x][original->y - 1] != 0)
+	{
+		temp.reset(new SNode(original->x, original->y - 1));
+		temp->score = original->score + arg_terrain[temp->x][temp->y];
+		temp->parent = (*nodelist_iterator).get();
+		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
+		{
+			adjacentList.push_front(move(temp));
+		}
+	}
 
     // Left
-    if (arg_node->x - 1 >= 0 && arg_terrain[arg_node->x - 1][arg_node->y] != 0)
-    {
-        temp.reset(new SNode);
-        temp->x = arg_node->x - 1;
-        temp->y = arg_node->y;
-        temp->score = arg_node->score + arg_terrain[temp->x][temp->y];
-        temp->parent = arg_node.get();
-        if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
-        {
-            //cout << "Creating left" << endl;
-            openList.push_front(move(temp));
-        }
-    }
+	if (original->x - 1 < 10 && arg_terrain[original->x - 1][original->y] != 0)
+	{
+		temp.reset(new SNode(original->x - 1, original->y));
+		temp->score = original->score + arg_terrain[temp->x][temp->y];
+		temp->parent = (*nodelist_iterator).get();
+		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
+		{
+			adjacentList.push_front(move(temp));
+		}
+	}
+
+	// Return adjacents
+	return adjacentList;
 }
 
 void PathfindDemo::StartSearch()
@@ -335,17 +335,22 @@ void PathfindDemo::ContinueSearch()
                 it = openList.begin();
             }
 
-            // Open adjacents
-            OpenAdjacents(*it, terrainMap);
+            // Get adjacents
+            NodeList adjacents = GetAdjacents(it, terrainMap);
 
-            // Move node from open to closed
-            closedList.push_back(move(openList.back()));
-            openList.pop_back();
-            /*unique_ptr<SNode> tmp(new SNode());
-            tmp->x = (*it)->x;
-            tmp->y = (*it)->y;
-            closedList.push_back(move(tmp));
-            openList.erase(it);*/
+			// Move node from open to closed
+			unique_ptr<SNode> tmp(new SNode());
+			tmp->x = (*it)->x;
+			tmp->y = (*it)->y;
+			tmp->parent = (*it)->parent;
+			closedList.push_back(move(tmp));
+			openList.erase(it);
+
+			// Add adjacents
+			for (auto& nodePointer : adjacents)
+			{
+				openList.push_back(move(nodePointer));
+			}
         }
     }
     else
