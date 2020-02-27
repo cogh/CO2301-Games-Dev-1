@@ -344,7 +344,7 @@ void PathfindDemo::ContinueSearch()
 			tmp->y = (*it)->y;
 			tmp->parent = (*it)->parent;
 			closedList.push_back(move(tmp));
-			openList.erase(it);
+			openList.erase(it);  // This line breaks the parent pointers within adjacent list
 
 			// Add adjacents
 			for (auto& nodePointer : adjacents)
