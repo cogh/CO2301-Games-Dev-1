@@ -62,12 +62,15 @@ bool CSearchAStar::FindPath(TerrainMap& terrain, unique_ptr<SNode> start, unique
 
 void CSearchAStar::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain)
 {
+    // Boundaries
+    int terrainWidth = arg_terrain.size();
+    int terrainHeight = arg_terrain[0].size();
     // Create temporary SNode pointer
     unique_ptr <SNode> temp;
     //cout << "Opening adjacents for (" << arg_node->x << ", " << arg_node->y << ")" << endl;
 
     // Up
-    if (arg_node->y + 1 < 10 && arg_terrain[arg_node->x][arg_node->y+1] != 0)
+    if (arg_node->y + 1 < terrainHeight && arg_terrain[arg_node->x][arg_node->y+1] != 0)
     {
         temp.reset(new SNode);
         temp->x = arg_node->x;
@@ -82,7 +85,7 @@ void CSearchAStar::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
     }
 
     // Right
-    if (arg_node->x + 1 < 10 && arg_terrain[arg_node->x+1][arg_node->y] != 0)
+    if (arg_node->x + 1 < terrainWidth && arg_terrain[arg_node->x+1][arg_node->y] != 0)
     {
         temp.reset(new SNode);
         temp->x = arg_node->x + 1;
@@ -170,7 +173,7 @@ void CSearchAStar::DisplayPathfinding(TerrainMap argTerrain)
     // Create empty display grid
     vector<vector<string>> displayGrid;
     int width = argTerrain.size();
-    int height = argTerrain.size();
+    int height = argTerrain[0].size();
     for (int x = 0; x < width; x++) {
         vector<string> row;
         for (int y = 0; y < height; y++) {
@@ -195,8 +198,8 @@ void CSearchAStar::DisplayPathfinding(TerrainMap argTerrain)
     }
     
     // Display whole grid
-    for (int y = displayGrid.size() - 1; y >= 0; y--) {
-        for (int x = 0; x < displayGrid.size(); x++) {
+    for (int y = height- 1; y >= 0; y--) {
+        for (int x = 0; x < width; x++) {
             cout << displayGrid[x][y];
         }
         cout << endl;

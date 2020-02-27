@@ -26,6 +26,52 @@ public:
     int y;
 };
 
+/*class PathPlotter
+{
+public:
+    IMesh* mMesh;
+    IModel* mModel;
+    int mScale;
+    NodeList mPath;
+    NodeList::iterator mTargetIndex;
+    bool running;
+    PathPlotter(IMesh* mesh, int scale)
+    {
+        mMesh = mesh;
+        mModel = mesh->CreateModel();
+        mScale = scale;
+        mTargetIndex = mPath.begin();
+        running = false;
+    }
+    void SetPath(NodeList path)
+    {
+        mPath = path;
+    }
+    void Run(float deltaTime)
+    {
+        float distance = DistanceToNextNode();
+        if (distance < mScale)
+        {
+            SNode target = **mTargetIndex;
+            float xDif = target.x - mModel->GetX();
+            float yDif = target.y - mModel->GetY();
+            mModel->MoveX(xDif / distance * mScale * deltaTime);
+            mModel->MoveY(yDif / distance * mScale * deltaTime);
+        }
+        else
+        {
+            mTargetIndex++;
+        }
+    }
+    float DistanceToNextNode()
+    {
+        SNode target = **mTargetIndex;
+        float xDif = target.x - mModel->GetX();
+        float yDif = target.y - mModel->GetY();
+        return abs((sqrt((xDif * xDif) + (yDif * yDif))));
+    }
+};*/
+
 void main()
 {
 	// Create a 3D engine (using TLX engine here) and open a window for it
@@ -33,14 +79,18 @@ void main()
 	myEngine->StartWindowed();
 
 	// Add default folder for meshes and other media
-	myEngine->AddMediaFolder( "C:\\ProgramData\\TL-Engine\\Media" );
+    myEngine->AddMediaFolder("C:\\ProgramData\\TL-Engine\\Media");
+    myEngine->AddMediaFolder("./Media");
 
 	// Meshes
 	IMesh* cubeMesh = myEngine->LoadMesh("Cube.x");
-    IMesh* arrowMesh = myEngine->LoadMesh("Sphere.x");
+    IMesh* sphereMesh = myEngine->LoadMesh("Sphere.x");
+    IMesh* bushMesh = myEngine->LoadMesh("bush.x");
 
     // Demo
-    PathfindDemo demo = PathfindDemo(cubeMesh, 10);
+    PathfindDemo demo = PathfindDemo(cubeMesh, bushMesh, 10);
+    //PathPlotter pathPlotter = PathPlotter(sphereMesh, 10);
+
 
     // Time
     float time = 1;
@@ -171,8 +221,11 @@ void main()
             // Graphical display
             else if (console_manager.answer == 9)
             {
+                demo.searchMode = currentAlgorithm;
                 demo.SetCoordsFromFile(mapIdentifier);
-                demo.goal->x = startNode->x;
+                demo.start->x = startNode->x;
+                demo.start->y = startNode->y;
+                demo.goal->x = endNode->x;
                 demo.goal->y = endNode->y;
                 demo.SetTerrainMapFromFile(mapIdentifier);
                 demo.StartSearch();
@@ -206,15 +259,41 @@ void main()
             console_manager.clear();
         }
     
-        // TIme
+        // Time
         time -= myEngine->Timer();
+        float deltaTime = myEngine->Timer();
 
         // Run path
-        if (demo.searchActive == true && time <= 0)
+        if (demo.searchActive == true)
         {
-            demo.ContinueSearch();
-            demo.UpdateDisplay();
-            time = 1.0f;
+            if (time <= 0)
+            {
+                demo.UpdateDisplay();
+                demo.ContinueSearch();
+                time = 1.0f;
+            }
+        }
+        else // reset to console
+        {
+            demo.openList.clear();
+            demo.closedList.clear();
+            //demo.path.clear();
+            //runConsoleManager = true;
+            /*if (pathPlotter.running == false)
+            {
+                // Copy path
+                for (int i = 0; i < demo.path.size(); i++)
+                {
+                    pathPlotter.mPath.push_back(move(demo.path[i]));
+                }
+                // Set running
+                pathPlotter.running = true;
+            }
+            else
+            {
+                pathPlotter.Run(deltaTime);
+            }*/
+            cout << endl << "Search complete. Define new search?" << endl;
         }
 
 

@@ -1,10 +1,19 @@
 #include "PathfindDemo.h"
 
-PathfindDemo::PathfindDemo(IMesh* argCubeMesh, int argScale)
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////  CONSTRUCTOR  ////////
+
+PathfindDemo::PathfindDemo(IMesh* argCubeMesh, IMesh* argBushMesh, int argScale)
 {
 	cubeMesh = argCubeMesh;
     scale = argScale;
+    bushMesh = argBushMesh;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////  FILE FUNCTIONS  ////////
 
 void PathfindDemo::SetTerrainMapFromFile(string mapIdentifier)
 {
@@ -50,6 +59,10 @@ void PathfindDemo::SetCoordsFromFile(string mapIdentifier)
     goal.reset(new SNode(goalNode));
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////  DISPLAY FUNCTIONS  ////////
+
 void PathfindDemo::InstantiateModelsFromTerrainMap(TerrainMap argTerrainMap)
 {
 	string skin;
@@ -63,30 +76,41 @@ void PathfindDemo::InstantiateModelsFromTerrainMap(TerrainMap argTerrainMap)
 			modelX = x * scale;
 			modelY = 0;
 			modelZ = y * scale;
+            bool hasBush = false;
 			switch (argTerrainMap[x][y]) 
 			{
-			case 0:
-				skin = "brick1.jpg";
-				modelY += scale;
-				break;
-			case 1:
+			case Clear:
 				skin = "Grass1.jpg";
 				break;
-			case 2:
-				skin = "Grey.jpg";
+			case Wood:
+				skin = "Grass1.jpg";
+                hasBush = true;
 				break;
-			case 3:
+			case Water:
 				skin = "Neptune.jpg";
+                modelY -= scale;
 				break;
+            case Wall:
+                skin = "brick1.jpg";
+                modelY += scale;
+                break;
 			}
             IModel* model = cubeMesh->CreateModel();
             model->SetSkin(skin);
             model->SetPosition(modelX, modelY, modelZ);
+            terrainMapModels.push_back(model);
+            if (hasBush)
+            {
+                IModel* bushModel = bushMesh->CreateModel();
+                bushModel->SetPosition(modelX, modelY+scale, modelZ);
+                bushModel->Scale(10);
+                terrainMapModels.push_back(bushModel);
+            }
         }
     }
 }
 
-void PathfindDemo::InstantiateModelsFromNodeList(NodeList& argNodeList, IMesh* mesh, string skin)
+void PathfindDemo::InstantiateModelsFromNodeList(NodeList& argNodeList, vector<IModel*>& modelList, IMesh* mesh, string skin)
 {
 	for (auto& node : argNodeList)
 	{
@@ -98,93 +122,101 @@ void PathfindDemo::InstantiateModelsFromNodeList(NodeList& argNodeList, IMesh* m
 			IModel* model = mesh->CreateModel();
 			model->SetSkin(skin);
 			model->SetPosition(x, y, z);
+            modelList.push_back(model);
 		}
 	}
 }
 
 void PathfindDemo::InstantiateModelsFromNode(unique_ptr<SNode>& node, IMesh* mesh, string skin)
 {
-	int x = node->x * scale;
-	int y = scale;
-	int z = node->y * scale;
-	IModel* model = mesh->CreateModel();
-	model->SetSkin(skin);
-	model->SetPosition(x, y, z);
+    int x = node->x * scale;
+    int y = scale;
+    int z = node->y * scale;
+    IModel* model = mesh->CreateModel();
+    model->SetSkin(skin);
+    model->SetPosition(x, y, z);
 }
 
 void PathfindDemo::ClearModelList(vector<IModel*> modelList)
 {
-    for (int i = 0; i < modelList.size(); i++)
+    while (modelList.size() > 0)
     {
-        delete modelList[i];
+        IModel* model = modelList.back();
+        IMesh* mesh = model->GetMesh();
+        mesh->RemoveModel(model);
+        modelList.pop_back();
     }
 }
 
-void PathfindDemo::StartSearch()
+void PathfindDemo::ClearModels()
 {
-	// Add start to open
-	start->parent = 0;
-	openList.push_back(move(start));
-	leftBorder = -20;
-	backBorder = -20;
-    //backBorder = -(terrainMap[0].size() * scale / 2);
-	searchActive = true;
+    ClearModelList(openListModels);
+    ClearModelList(closedListModels);
+    ClearModelList(terrainMapModels);
 }
 
-void PathfindDemo::ContinueSearch()
+void PathfindDemo::DeleteModelFromNodeList(vector<IModel*>::iterator model)
 {
-    if (openList.size() > 0)
-    {
-        // Count iterations
-        iterations++;
-        // Check for end
-        if (openList.back()->x == goal->x && openList.back()->y == goal->y)
-        {
-            // Add through goal's hierarchy
-            path.push_back(move(openList.back()));
-            while (path.front()->parent != 0)
-            {
-                unique_ptr<SNode> parentNode;
-                parentNode.reset(move(path.front()->parent));
-                path.push_front(move(parentNode));
-            }
-            searchActive = false;
-        }
-        else // Open adjacents
-        {
-            // Find best node to open
-            NodeList::iterator it = FindClosestNode(openList, goal);
-
-            // Open adjacents
-            OpenAdjacents(*it, terrainMap);
-
-            // Move node from open to closed
-            //cout << "Closing (" << openList.back()->x << ", " << openList.back()->y << ")" << endl;
-            closedList.push_back(move(openList.back()));
-            openList.pop_back();
-        }
-    }
-    else
-    {
-        // Generate path
-
-
-        // Stop running
-        searchActive = false;
-    }
+    //IMesh* mesh = *model->GetMesh();
+    //mesh->RemoveModel(*model);
+    //modelList.pop_back();
 }
 
 void PathfindDemo::UpdateDisplay()
 {
-    ClearModelList(openListModels);
-    ClearModelList(closedListModels);
-    InstantiateModelsFromNodeList(openList, cubeMesh, "Baize.jpg");
-    InstantiateModelsFromNodeList(closedList, cubeMesh, "BaizeDark.jpg");
-	InstantiateModelsFromTerrainMap(terrainMap);
-	InstantiateModelsFromNode(start, cubeMesh, "Violet.PNG");
-	InstantiateModelsFromNode(goal, cubeMesh, "Sun.jpg");
-	DisplayPathfinding(terrainMap);
+    //ClearModelList(openListModels);
+    //ClearModelList(closedListModels);
+    InstantiateModelsFromTerrainMap(terrainMap);
+    InstantiateModelsFromNodeList(openList, openListModels, cubeMesh, "Baize.jpg");
+    InstantiateModelsFromNodeList(closedList, closedListModels, cubeMesh, "BaizeDark.jpg");
+    InstantiateModelsFromNode(start, cubeMesh, "start.jpg");
+    InstantiateModelsFromNode(goal, cubeMesh, "end.jpg");
+    DisplayPathfinding(terrainMap);
 }
+
+void PathfindDemo::DisplayPathfinding(TerrainMap argTerrain)
+{
+    // Create empty display grid
+    system("CLS");
+    cout << "Iteration: " << iterations << endl;
+    vector<vector<string>> displayGrid;
+    int width = argTerrain.size();
+    int height = argTerrain.size();
+    for (int x = 0; x < width; x++) {
+        vector<string> row;
+        for (int y = 0; y < height; y++) {
+            row.push_back("-");
+        }
+        displayGrid.push_back(row);
+    }
+
+    // Overwrite with terrain data
+    /*for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            displayGrid[x][y] = to_string(argTerrain[x][y]);
+        }
+    }*/
+
+    // Overwrite with node data
+    for (auto iter = openList.begin(); iter != openList.end(); ++iter) {
+        displayGrid[(*iter)->x][(*iter)->y] = "O";
+    }
+    for (auto iter = closedList.begin(); iter != closedList.end(); ++iter) {
+        displayGrid[(*iter)->x][(*iter)->y] = "X";
+    }
+
+    // Display whole grid
+    for (int y = displayGrid.size() - 1; y >= 0; y--) {
+        for (int x = 0; x < displayGrid.size(); x++) {
+            cout << displayGrid[x][y];
+        }
+        cout << endl;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////  PATHFINDING FUNCTIONS  ////////
 
 void PathfindDemo::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_terrain)
 {
@@ -253,42 +285,70 @@ void PathfindDemo::OpenAdjacents(unique_ptr<SNode>& arg_node, TerrainMap arg_ter
     }
 }
 
-void PathfindDemo::DisplayPathfinding(TerrainMap argTerrain)
+void PathfindDemo::StartSearch()
 {
-	// Create empty display grid
-	system("CLS");
-	cout << "Iteration: " << iterations << endl;
-	vector<vector<string>> displayGrid;
-	int width = argTerrain.size();
-	int height = argTerrain.size();
-	for (int x = 0; x < width; x++) {
-		vector<string> row;
-		for (int y = 0; y < height; y++) {
-			row.push_back("-");
-		}
-		displayGrid.push_back(row);
-	}
-
-	// Overwrite with terrain data
-	/*for (int x = 0; x < width; x++) {
-		for (int y = 0; y < height; y++) {
-			displayGrid[x][y] = to_string(argTerrain[x][y]);
-		}
-	}*/
-
-	// Overwrite with node data
-	for (auto iter = openList.begin(); iter != openList.end(); ++iter) {
-		displayGrid[(*iter)->x][(*iter)->y] = "O";
-	}
-	for (auto iter = closedList.begin(); iter != closedList.end(); ++iter) {
-		displayGrid[(*iter)->x][(*iter)->y] = "X";
-	}
-
-	// Display whole grid
-	for (int y = displayGrid.size() - 1; y >= 0; y--) {
-		for (int x = 0; x < displayGrid.size(); x++) {
-			cout << displayGrid[x][y];
-		}
-		cout << endl;
-	}
+    // Reset iterations
+    iterations = 0;
+    // Add start to open
+    start->parent = 0;
+    unique_ptr<SNode> temp;
+    temp.reset(new SNode(start->x, start->y));
+    openList.push_back(move(temp));
+    leftBorder = -20;
+    backBorder = -20;
+    searchActive = true;
 }
+
+void PathfindDemo::ContinueSearch()
+{
+    if (openList.size() > 0)
+    {
+        // Count iterations
+        iterations++;
+        // Check for end
+        if (openList.back()->x == goal->x && openList.back()->y == goal->y)
+        {
+            // Clear models
+            ClearModelList(openListModels);
+            ClearModelList(closedListModels);
+            // Add through goal's hierarchy
+            path.push_back(move(openList.back()));
+            while (path.front()->parent != 0)
+            {
+                unique_ptr<SNode> parentNode;
+                parentNode.reset(move(path.front()->parent));
+                path.push_front(move(parentNode));
+            }
+            InstantiateModelsFromNodeList(path, pathModels, cubeMesh, "path.jpg");
+            searchActive = false;
+        }
+        else // Open adjacents
+        {
+            // Find best node to open
+            NodeList::iterator it;
+            if (searchMode == AStar)
+            {
+                it = FindClosestNode(openList, goal);
+            }
+            else
+            {
+                it = openList.begin();
+            }
+
+            // Open adjacents
+            OpenAdjacents(*it, terrainMap);
+
+            // Move node from open to closed
+            //cout << "Closing (" << openList.back()->x << ", " << openList.back()->y << ")" << endl;
+            closedList.push_back(move(openList.back()));
+            openList.pop_back();
+        }
+    }
+    else
+    {
+        // Stop running
+        searchActive = false;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
