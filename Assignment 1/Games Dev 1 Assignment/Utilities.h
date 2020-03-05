@@ -29,3 +29,5 @@ int Heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target);
 NodeList::iterator FindClosestNode(NodeList& nodeList, unique_ptr<SNode>& goal);
 
 bool NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeList);
+
+void DisplayNode(unique_ptr<SNode>& node);

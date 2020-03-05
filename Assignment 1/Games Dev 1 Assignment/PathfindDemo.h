@@ -45,6 +45,7 @@ public:
 	void OpenAdjacents(NodeList::iterator arg_node_iterator, TerrainMap arg_terrain);
 	void OpenAdjacents(SNode& arg_node, TerrainMap arg_terrain);
 	NodeList GetAdjacents(NodeList::iterator nodelist_iterator, TerrainMap arg_terrain);
+	NodeList GetAdjacents(unique_ptr<SNode>& node, TerrainMap arg_terrain);
 	void StartSearch();
     void ContinueSearch();
     void UpdateDisplay();

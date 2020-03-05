@@ -5,4 +5,3 @@ Node 3: 3, 7
 Node 4: 4, 7
 Node 5: 5, 7
 Node 6: 5, 6
-Node 7: 3, 8

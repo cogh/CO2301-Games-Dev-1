@@ -102,3 +102,16 @@ bool NodeExists(unique_ptr<SNode>& argNode, deque<unique_ptr<SNode>>& argNodeLis
     }
     return false;
 }
+
+void DisplayNode(unique_ptr<SNode>& nodeUniquePointer)
+{
+	SNode node = *nodeUniquePointer.get();
+	cout << "New Node" << endl;
+	cout << "--------" << endl;
+	cout << "address: " << nodeUniquePointer.get() << endl;
+	cout << "x: " << node.x << endl;
+	cout << "y: " << node.y << endl;
+	cout << "score: " << node.score << endl;
+	cout << "parent: " << node.parent << endl;
+	cout << endl;
+}
