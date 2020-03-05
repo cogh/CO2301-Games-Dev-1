@@ -297,10 +297,15 @@ void main()
         {
             if (pathPlotter.running == false)
             {
-                // Set target node iterator
-                pathPlotter.CopyPath(demo.path);
-                // Set running
-                pathPlotter.running = true;
+				if (demo.path.size() > 0)
+				{
+					// write to file
+					writeNodeListToFile(demo.path, mapIdentifier);
+					// Set target node iterator
+					pathPlotter.CopyPath(demo.path);
+					// Set running
+					pathPlotter.running = true;
+				}
             }
             else
             {
@@ -310,7 +315,7 @@ void main()
             //demo.closedList.clear();
             //demo.path.clear();
             //runConsoleManager = true;
-            cout << endl << "Search complete. Define new search?" << endl;
+            //cout << endl << "Search complete. Define new search?" << endl;
         }
 
 

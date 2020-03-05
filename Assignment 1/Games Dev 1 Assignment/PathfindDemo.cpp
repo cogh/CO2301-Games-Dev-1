@@ -218,89 +218,14 @@ void PathfindDemo::DisplayPathfinding(TerrainMap argTerrain)
 
 ////////  PATHFINDING FUNCTIONS  ////////
 
-NodeList PathfindDemo::GetAdjacents(NodeList::iterator nodelist_iterator, TerrainMap arg_terrain)
-{
-	// Create adjacent list
-	NodeList adjacentList;
-
-	// Create original position node pointer
-	unique_ptr<SNode> original(new SNode());
-	original->x = (*nodelist_iterator)->x;
-	original->y = (*nodelist_iterator)->y;
-	original->score = (*nodelist_iterator)->score;
-	original->parent = (*nodelist_iterator)->parent;
-
-	// Create temporary node pointer for new nodes
-	unique_ptr <SNode> temp(new SNode());
-
-	// Up
-	if (original->y + 1 < 10 && arg_terrain[original->x][original->y + 1] != 0)
-	{
-		temp.reset(new SNode(original->x, original->y + 1));
-		temp->score = original->score + arg_terrain[temp->x][temp->y];
-		auto originalRaw = nodelist_iterator->get();
-		temp->parent = originalRaw;
-		cout << "temp for up: " << endl;
-		DisplayNode(temp);
-		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
-		{
-			adjacentList.push_front(move(temp));
-		}
-	}
-
-	// Right
-	if (original->x + 1 < 10 && arg_terrain[original->x + 1][original->y] != 0)
-	{
-		temp.reset(new SNode(original->x + 1, original->y));
-		temp->score = original->score + arg_terrain[temp->x][temp->y];
-		auto originalRaw = nodelist_iterator->get();
-		temp->parent = originalRaw;
-		cout << "temp for right: " << endl;
-		DisplayNode(temp);
-		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
-		{
-			adjacentList.push_front(move(temp));
-		}
-	}
-
-	// Down
-	if (original->y - 1 >= 0 && arg_terrain[original->x][original->y - 1] != 0)
-	{
-		temp.reset(new SNode(original->x, original->y - 1));
-		temp->score = original->score + arg_terrain[temp->x][temp->y];
-		auto originalRaw = nodelist_iterator->get();
-		temp->parent = originalRaw;
-		cout << "temp for down: " << endl;
-		DisplayNode(temp);
-		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
-		{
-			adjacentList.push_front(move(temp));
-		}
-	}
-
-	// Left
-	if (original->x - 1 < 10 && arg_terrain[original->x - 1][original->y] != 0)
-	{
-		temp.reset(new SNode(original->x - 1, original->y));
-		temp->score = original->score + arg_terrain[temp->x][temp->y];
-		auto originalRaw = nodelist_iterator->get();
-		temp->parent = originalRaw;
-		cout << "temp for left: " << endl;
-		DisplayNode(temp);
-		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
-		{
-			adjacentList.push_front(move(temp));
-		}
-	}
-
-	// Return adjacents
-	return adjacentList;
-}
-
 NodeList PathfindDemo::GetAdjacents(unique_ptr<SNode>& node, TerrainMap arg_terrain)
 {
 	// Create adjacent list
 	NodeList adjacentList;
+
+	// Get size
+	int width = arg_terrain.size();
+	int height = arg_terrain[0].size();
 
 	// Create original position node pointer
 	unique_ptr<SNode> original(new SNode());
@@ -313,7 +238,7 @@ NodeList PathfindDemo::GetAdjacents(unique_ptr<SNode>& node, TerrainMap arg_terr
 	unique_ptr <SNode> temp(new SNode());
 
 	// Up
-	if (original->y + 1 < 10 && arg_terrain[original->x][original->y + 1] != 0)
+	if (original->y + 1 < height && arg_terrain[original->x][original->y + 1] != 0)
 	{
 		temp.reset(new SNode(original->x, original->y + 1));
 		temp->score = original->score + arg_terrain[temp->x][temp->y];
@@ -327,7 +252,7 @@ NodeList PathfindDemo::GetAdjacents(unique_ptr<SNode>& node, TerrainMap arg_terr
 	}
 
 	// Right
-	if (original->x + 1 < 10 && arg_terrain[original->x + 1][original->y] != 0)
+	if (original->x + 1 < width && arg_terrain[original->x + 1][original->y] != 0)
 	{
 		temp.reset(new SNode(original->x + 1, original->y));
 		temp->score = original->score + arg_terrain[temp->x][temp->y];
@@ -355,7 +280,7 @@ NodeList PathfindDemo::GetAdjacents(unique_ptr<SNode>& node, TerrainMap arg_terr
 	}
 
 	// Left
-	if (original->x - 1 < 10 && arg_terrain[original->x - 1][original->y] != 0)
+	if (original->x - 1 >= 0 && arg_terrain[original->x - 1][original->y] != 0)
 	{
 		temp.reset(new SNode(original->x - 1, original->y));
 		temp->score = original->score + arg_terrain[temp->x][temp->y];
@@ -399,20 +324,12 @@ void PathfindDemo::ContinueSearch()
             ClearModelList(openListModels);
             ClearModelList(closedListModels);
             // Add through goal's hierarchy
-            path.push_front(move(closedList.back()));
-            cout << "path end: " << path[0] << endl;
-            cout << "x: " << path.front()->x << endl;
-            cout << "y: " << path.front()->y << endl;
-            cout << "parent: " << path.front()->parent << endl;
+            path.push_front(move(openList.back()));
             while (path.front()->parent != 0)
             {
                 unique_ptr<SNode> parentNode;
                 parentNode.reset(move(path.front()->parent));
                 path.push_front(move(parentNode));
-                cout << "New entry: " << path[0] << endl;
-                cout << "x: " << path.front()->x << endl;
-                cout << "y: " << path.front()->y << endl;
-                cout << "parent: " << path.front()->parent << endl;
             }
             InstantiateModelsFromNodeList(path, pathModels, cubeMesh, "path.jpg");
             searchActive = false;
