@@ -25,11 +25,19 @@ struct SNode
   bool downOpened = false;
   bool leftOpened = false;
   bool rightOpened = false;
-  SNode() {};
+  SNode() 
+  {
+      x = 0;
+      y = 0;
+      score = 0;
+      parent = nullptr;
+  };
   SNode(int arg_x, int arg_y)
   {
       x = arg_x;
       y = arg_y;
+      score = 0;
+      parent = nullptr;
   }
 };
 

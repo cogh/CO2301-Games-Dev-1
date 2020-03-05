@@ -223,6 +223,10 @@ NodeList PathfindDemo::GetAdjacents(NodeList::iterator nodelist_iterator, Terrai
 	// Create adjacent list
 	NodeList adjacentList;
 
+    // Debug print
+    //cout << "by reference: " << &*nodelist_iterator << endl;
+    //cout << "using get: " << nodelist_iterator->get() << endl;
+
     // Create original position node pointer
 	unique_ptr<SNode> original(new SNode());
 	original->x = (*nodelist_iterator)->x;
@@ -238,7 +242,11 @@ NodeList PathfindDemo::GetAdjacents(NodeList::iterator nodelist_iterator, Terrai
     {
         temp.reset(new SNode(original->x,original->y+1));
         temp->score = original->score + arg_terrain[temp->x][temp->y];
-        temp->parent = (*nodelist_iterator).get();
+        auto originalRaw = nodelist_iterator->get();
+        temp->parent = originalRaw;
+        cout << "this temp: " << temp.get() << endl;
+        cout << "original raw: " << originalRaw << endl;
+        cout << "new parent: " << temp->parent << endl << endl;
         if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
         {
 			adjacentList.push_front(move(temp));
@@ -250,7 +258,11 @@ NodeList PathfindDemo::GetAdjacents(NodeList::iterator nodelist_iterator, Terrai
 	{
 		temp.reset(new SNode(original->x + 1, original->y));
 		temp->score = original->score + arg_terrain[temp->x][temp->y];
-		temp->parent = (*nodelist_iterator).get();
+        auto originalRaw = nodelist_iterator->get();
+        temp->parent = originalRaw;
+        cout << "this temp: " << temp.get() << endl;
+        cout << "original raw: " << originalRaw << endl;
+        cout << "new parent: " << temp->parent << endl << endl;
 		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
 		{
 			adjacentList.push_front(move(temp));
@@ -262,7 +274,11 @@ NodeList PathfindDemo::GetAdjacents(NodeList::iterator nodelist_iterator, Terrai
 	{
 		temp.reset(new SNode(original->x, original->y - 1));
 		temp->score = original->score + arg_terrain[temp->x][temp->y];
-		temp->parent = (*nodelist_iterator).get();
+        auto originalRaw = nodelist_iterator->get();
+        temp->parent = originalRaw;
+        cout << "this temp: " << temp.get() << endl;
+        cout << "original raw: " << originalRaw << endl;
+        cout << "new parent: " << temp->parent << endl << endl;
 		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
 		{
 			adjacentList.push_front(move(temp));
@@ -274,7 +290,11 @@ NodeList PathfindDemo::GetAdjacents(NodeList::iterator nodelist_iterator, Terrai
 	{
 		temp.reset(new SNode(original->x - 1, original->y));
 		temp->score = original->score + arg_terrain[temp->x][temp->y];
-		temp->parent = (*nodelist_iterator).get();
+        auto originalRaw = nodelist_iterator->get();
+        temp->parent = originalRaw;
+        cout << "this temp: " << temp.get() << endl;
+        cout << "original raw: " << originalRaw << endl;
+        cout << "new parent: " << temp->parent << endl << endl;
 		if (!NodeExists(temp, openList) && !NodeExists(temp, closedList))
 		{
 			adjacentList.push_front(move(temp));
@@ -312,12 +332,20 @@ void PathfindDemo::ContinueSearch()
             ClearModelList(openListModels);
             ClearModelList(closedListModels);
             // Add through goal's hierarchy
-            path.push_back(move(openList.back()));
+            path.push_front(move(closedList.back()));
+            cout << "path end: " << path[0] << endl;
+            cout << "x: " << path.front()->x << endl;
+            cout << "y: " << path.front()->y << endl;
+            cout << "parent: " << path.front()->parent << endl;
             while (path.front()->parent != 0)
             {
                 unique_ptr<SNode> parentNode;
                 parentNode.reset(move(path.front()->parent));
                 path.push_front(move(parentNode));
+                cout << "New entry: " << path[0] << endl;
+                cout << "x: " << path.front()->x << endl;
+                cout << "y: " << path.front()->y << endl;
+                cout << "parent: " << path.front()->parent << endl;
             }
             InstantiateModelsFromNodeList(path, pathModels, cubeMesh, "path.jpg");
             searchActive = false;
