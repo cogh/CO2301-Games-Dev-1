@@ -81,11 +81,28 @@ int Heuristic(unique_ptr<SNode>& origin, unique_ptr<SNode>& target)
     return origin->score + abs(origin->x - target->x) + abs(origin->y - target->y);
 }
 
+int HeuristicNoScore(unique_ptr<SNode>& origin, unique_ptr<SNode>& target)
+{
+    // Get Manhattan distance
+    return abs(origin->x - target->x) + abs(origin->y - target->y);
+}
+
 NodeList::iterator FindClosestNode(NodeList& nodeList, unique_ptr<SNode>& goal)
 {
     auto closestNode = nodeList.begin();
     for (auto iter = nodeList.begin(); iter != nodeList.end(); ++iter) {
         if (Heuristic(*iter, goal) < Heuristic(*closestNode, goal)) {
+            closestNode = iter;
+        }
+    }
+    return closestNode;
+}
+
+NodeList::iterator FindClosestNodeNoScore(NodeList& nodeList, unique_ptr<SNode>& goal)
+{
+    auto closestNode = nodeList.begin();
+    for (auto iter = nodeList.begin(); iter != nodeList.end(); ++iter) {
+        if (HeuristicNoScore(*iter, goal) < HeuristicNoScore(*closestNode, goal)) {
             closestNode = iter;
         }
     }

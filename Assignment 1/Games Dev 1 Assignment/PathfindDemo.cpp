@@ -309,6 +309,41 @@ void PathfindDemo::StartSearch()
     leftBorder = -20;
     backBorder = -20;
     searchActive = true;
+
+    // Find best node to open
+    NodeList::iterator it;
+    if (searchMode == AStar)
+    {
+        it = FindClosestNode(openList, goal);
+    }
+    else
+    {
+        it = openList.begin();
+    }
+
+    // Create temp variable from chosen node on open
+    unique_ptr<SNode> tmp(new SNode());
+    tmp->x = (*it)->x;
+    tmp->y = (*it)->y;
+    tmp->score = (*it)->score;
+    tmp->parent = (*it)->parent;
+
+    // Get adjacents for temp variable
+    cout << "getting adjacents for " << endl;
+    DisplayNode(tmp);
+    NodeList adjacents = GetAdjacents(tmp, terrainMap);
+
+    // Push temp onto closed list and erase entry from open list
+    closedList.push_back(move(tmp));
+    openList.erase(it);
+
+    // Add adjacents
+    for (auto& nodePointer : adjacents)
+    {
+        cout << "Adding node from adjacents to open" << endl;
+        DisplayNode(nodePointer);
+        openList.push_back(move(nodePointer));
+    }
 }
 
 void PathfindDemo::ContinueSearch()
@@ -318,13 +353,13 @@ void PathfindDemo::ContinueSearch()
         // Count iterations
         iterations++;
         // Check for end
-        if (openList.back()->x == goal->x && openList.back()->y == goal->y)
+        if (closedList.back()->x == goal->x && closedList.back()->y == goal->y)
         {
             // Clear models
             ClearModelList(openListModels);
             ClearModelList(closedListModels);
             // Add through goal's hierarchy
-            path.push_front(move(openList.back()));
+            path.push_front(move(closedList.back()));
             while (path.front()->parent != 0)
             {
                 unique_ptr<SNode> parentNode;
@@ -361,7 +396,7 @@ void PathfindDemo::ContinueSearch()
 
 			// Push temp onto closed list and erase entry from open list
 			closedList.push_back(move(tmp));
-			openList.erase(it);  // This line breaks the parent pointers within adjacent list?
+			openList.erase(it); 
 
 			// Add adjacents
 			for (auto& nodePointer : adjacents)
